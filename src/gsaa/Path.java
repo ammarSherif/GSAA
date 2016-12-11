@@ -88,4 +88,12 @@ public class Path {
     public String getLastCity() {
         return lastCity;
     }
+
+    public void setTotalCost(double totalCost) {
+        this.totalCost = totalCost;
+    }
+
+    public void setLastHeuristic(double lastHeuristic) {
+        this.lastHeuristic = lastHeuristic;
+    }
 }

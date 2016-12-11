@@ -52,8 +52,6 @@ public class GSAA extends Application {
     private static City target;
     private static String lastChoice = " ";
     private boolean stopFlag;
-//    private Path p;
-//    private EventHandler<ActionEvent> event;
     private Thread runThread;
     private long lastTime = 0;
     private long currentTime = 0;
@@ -72,8 +70,6 @@ public class GSAA extends Application {
         }
     };
 
-    //private final City[] cities = new City[20];
-    //private final Link[] links = new Link[23];
     /**
      * @param args the command line arguments
      */
@@ -84,7 +80,6 @@ public class GSAA extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        //To change body of generated methods, choose Tools | Templates.
 
         stopFlag = false;
 
@@ -201,6 +196,11 @@ public class GSAA extends Application {
                         paths.get(paths.size() - 1).leave();
                     }
                     break;
+                case "UCost":
+                    if (getMinPath() != null) {
+                        getMinPath().leave();
+                    }
+                    break;
                 default:
                     break;
             }
@@ -223,7 +223,7 @@ public class GSAA extends Application {
             if (algorithmType.getValue().toString().contains("A*")) {   //A*
                 lastChoice = "A*";
                 runThread = new Thread(() -> {
-                    AStarSearch();
+                    costSearch(true, true);
                     if (!stopFlag) {
                         pane.setDisable(false);
                         buttonNew.setDisable(false);
@@ -359,7 +359,6 @@ public class GSAA extends Application {
                         + "-fx-font-size: 12px;"
                         + "-fx-padding: 10 20 10 20;"
                         + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
-//                      
                 dialog.getDialogPane().setContent(gridPane);
 
                 // Request focus on the cost field by default.
@@ -462,7 +461,57 @@ public class GSAA extends Application {
                 });
                 runThread.start();
             } else if (algorithmType.getValue().toString().contains("Cost")) {  //Cheapest
-                System.out.println("Cheapest First");
+                if (GSAA.getTargetCity() == null) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("No target City!");
+                    alert.setContentText("Sorry but There is no target City\n"
+                            + " Please Specify it first by clicking it");
+                    GridPane g = (GridPane) alert.getDialogPane().lookup(".header-panel");
+                    g.setStyle("-fx-background-color: #E8E8E8");
+                    ButtonBar btnBar = (ButtonBar) alert.getDialogPane().lookup(".button-bar");
+                    btnBar.setStyle("-fx-background-color: #E8E8E8");
+                    btnBar.getButtons().forEach(b -> b.setStyle("-fx-background-color: "
+                            + "#090a0c,"
+                            + "linear-gradient(#38424b 0%, #1f2429 20%, #191d22 100%),"
+                            + "linear-gradient(#20262b, #191d22),"
+                            + "radial-gradient(center 50% 0%, radius 100%, rgba(114,131,148,0.9), rgba(255,255,255,0));"
+                            + "-fx-background-radius: 5,4,3,5;"
+                            + "-fx-background-insets: 0,1,2,0;"
+                            + "-fx-text-fill: white;"
+                            + "-fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );"
+                            + "-fx-font-family: \"Arial\";"
+                            + "-fx-text-fill: linear-gradient(white, #d0d0d0);"
+                            + "-fx-font-size: 12px;"
+                            + "-fx-padding: 10 20 10 20;"
+                            + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
+                    alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");
+                    alert.showAndWait();
+                    return;
+                }
+                lastChoice = "UCost";
+                runThread = new Thread(() -> {
+                    costSearch(true, false);
+                    if (!stopFlag) {
+                        pane.setDisable(false);
+                        buttonNew.setDisable(false);
+                        buttonSave.setDisable(false);
+                        buttonOpen.setDisable(false);
+                        buttonPause.setDisable(true);
+                        buttonStop.setDisable(true);
+                        buttonGenerateH.setDisable(false);
+                        buttonSolve.setDisable(false);
+                        algorithmType.setDisable(false);
+                        for (int i = 0; i < cities.size() || i < links.size(); i++) {
+                            if (i < cities.size()) {
+                                cities.get(i).setDisable(false);
+                            }
+                            if (i < links.size()) {
+                                links.get(i).setDisable(false);
+                            }
+                        }
+                    }
+                });
+                runThread.start();
             } else if (algorithmType.getValue().toString().contains("Beam")) {  //Beam
                 System.out.println("Beam Search");
             } else if (algorithmType.getValue().toString().contains("Hill")) {  // Hill
@@ -1006,7 +1055,7 @@ public class GSAA extends Application {
     }
 
     //=============================
-    private void AStarSearch() {
+    private void costSearch(boolean realCost, boolean heuristic) {
         Path p = getMinPath();
         if (stopFlag) {
             if (p != null) {
@@ -1027,16 +1076,16 @@ public class GSAA extends Application {
         }
         if (p != null && !paths.isEmpty() && checkExtended(p.getLastCity())) {
             paths.remove(p);
-            AStarSearch();
+            costSearch(realCost, heuristic);
         } else {
             if (p != null) {
                 p.visit();
             }
-            if (expandPath(p)) {
+            if (expandPath(p, realCost, heuristic)) {
                 if (p != null) {
                     p.leave();
                 }
-                AStarSearch();
+                costSearch(realCost, heuristic);
             } else {
                 if (p != null) {
                     p.leave();
@@ -1071,7 +1120,7 @@ public class GSAA extends Application {
                     return;
                 }
                 paths.remove(p);
-                AStarSearch();
+                costSearch(realCost, heuristic);
             }
         }
     }
@@ -1085,7 +1134,7 @@ public class GSAA extends Application {
                 if (front) {
                     paths.get(0).visit();
                     if (GSAA.getTargetCity().getName().equals(p.getLastCity())) {
-                        return ;
+                        return;
                     }
                 }
             }
@@ -1121,6 +1170,10 @@ public class GSAA extends Application {
     private void cleanPaths(int level) {
         for (int i = 0; i < paths.size(); i++) {
             if (paths.get(i).getPath().size() >= level && !paths.get(i).getLastCity().equals(GSAA.getTargetCity().getName())) {
+                paths.get(i).visit();
+                if (i != 0) {
+                    visitLink(paths.get(i).getPath().get(paths.get(i).getPath().size() - 1));
+                }
                 paths.get(i).leave();
                 paths.remove(i);
                 i--;
@@ -1189,7 +1242,7 @@ public class GSAA extends Application {
     }
 
     //=============================
-    private boolean expandPath(Path p) {    // A Star expansion
+    private boolean expandPath(Path p, boolean realCost, boolean heuristic) {    // A Star expansion
         boolean edited = false;
         if (p != null) {
             Path p2 = new Path(p);
@@ -1205,12 +1258,24 @@ public class GSAA extends Application {
                     }
                     if (!checkExtended(linkCities[pos])) {
                         if (!edited) {
-                            p.addLink(links.get(i), linkCities[pos]);
+                            if (realCost && heuristic) {
+                                p.addLink(links.get(i), linkCities[pos]);
+                            } else if (realCost && !heuristic) {
+                                p.addLink(links.get(i), linkCities[pos]);
+                                p.setTotalCost((p.getTotalCost() - p.getLastHeuristic()));
+                                p.setLastHeuristic(0);
+                            }
                             edited = true;
                             extendedCities.add(p2.getLastCity());
                         } else {
                             Path p3 = new Path(p2);
-                            p3.addLink(links.get(i), linkCities[pos]);
+                            if (realCost && heuristic) {
+                                p3.addLink(links.get(i), linkCities[pos]);
+                            } else if (realCost && !heuristic) {
+                                p3.addLink(links.get(i), linkCities[pos]);
+                                p3.setTotalCost((p3.getTotalCost() - p3.getLastHeuristic()));
+                                p3.setLastHeuristic(0);
+                            }
                             paths.add(p3);
                         }
                         visitLink(links.get(i));
@@ -1232,7 +1297,13 @@ public class GSAA extends Application {
                     }
                     edited = true;
                     Path p3 = new Path();
-                    p3.addLink(links.get(i), linkCities[pos]);
+                    if (realCost && heuristic) {
+                        p3.addLink(links.get(i), linkCities[pos]);
+                    } else if (realCost && !heuristic) {
+                        p3.addLink(links.get(i), linkCities[pos]);
+                        p3.setTotalCost((p3.getTotalCost() - p3.getLastHeuristic()));
+                        p3.setLastHeuristic(0);
+                    }
                     paths.add(p3);
                     visitLink(links.get(i));
                 }
