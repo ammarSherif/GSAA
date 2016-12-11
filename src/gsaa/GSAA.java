@@ -198,6 +198,11 @@ public class GSAA extends Application {
                         paths.get(0).leave();
                     }
                     break;
+                case "BFS":
+                    if (paths.size() >= 1) {
+                        paths.get(paths.size() - 1).leave();
+                    }
+                    break;
                 default:
                     break;
             }
@@ -273,7 +278,7 @@ public class GSAA extends Application {
                 }
                 lastChoice = "DFS";
                 runThread = new Thread(() -> {
-                    DepthFirst(0);
+                    DepthAndBreadth(0, true);
                     if (!stopFlag) {
                         pane.setDisable(false);
                         buttonNew.setDisable(false);
@@ -383,7 +388,7 @@ public class GSAA extends Application {
                 result.ifPresent(pair -> {
                     lastChoice = "DLS";
                     runThread = new Thread(() -> {
-                    DepthFirst(Integer.parseInt(pair));
+                        DepthAndBreadth(Integer.parseInt(pair), true);
                         if (!stopFlag) {
                             pane.setDisable(false);
                             buttonNew.setDisable(false);
@@ -407,7 +412,57 @@ public class GSAA extends Application {
                     runThread.start();
                 });
             } else if (algorithmType.getValue().toString().contains("BFS")) {   //Breadth
-                System.out.println("Breadth");
+                if (GSAA.getTargetCity() == null) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("No target City!");
+                    alert.setContentText("Sorry but There is no target City\n"
+                            + " Please Specify it first by clicking it");
+                    GridPane g = (GridPane) alert.getDialogPane().lookup(".header-panel");
+                    g.setStyle("-fx-background-color: #E8E8E8");
+                    ButtonBar btnBar = (ButtonBar) alert.getDialogPane().lookup(".button-bar");
+                    btnBar.setStyle("-fx-background-color: #E8E8E8");
+                    btnBar.getButtons().forEach(b -> b.setStyle("-fx-background-color: "
+                            + "#090a0c,"
+                            + "linear-gradient(#38424b 0%, #1f2429 20%, #191d22 100%),"
+                            + "linear-gradient(#20262b, #191d22),"
+                            + "radial-gradient(center 50% 0%, radius 100%, rgba(114,131,148,0.9), rgba(255,255,255,0));"
+                            + "-fx-background-radius: 5,4,3,5;"
+                            + "-fx-background-insets: 0,1,2,0;"
+                            + "-fx-text-fill: white;"
+                            + "-fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );"
+                            + "-fx-font-family: \"Arial\";"
+                            + "-fx-text-fill: linear-gradient(white, #d0d0d0);"
+                            + "-fx-font-size: 12px;"
+                            + "-fx-padding: 10 20 10 20;"
+                            + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
+                    alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");
+                    alert.showAndWait();
+                    return;
+                }
+                lastChoice = "BFS";
+                runThread = new Thread(() -> {
+                    DepthAndBreadth(0, false);  //false to specify Breadth
+                    if (!stopFlag) {
+                        pane.setDisable(false);
+                        buttonNew.setDisable(false);
+                        buttonSave.setDisable(false);
+                        buttonOpen.setDisable(false);
+                        buttonPause.setDisable(true);
+                        buttonStop.setDisable(true);
+                        buttonGenerateH.setDisable(false);
+                        buttonSolve.setDisable(false);
+                        algorithmType.setDisable(false);
+                        for (int i = 0; i < cities.size() || i < links.size(); i++) {
+                            if (i < cities.size()) {
+                                cities.get(i).setDisable(false);
+                            }
+                            if (i < links.size()) {
+                                links.get(i).setDisable(false);
+                            }
+                        }
+                    }
+                });
+                runThread.start();
             } else if (algorithmType.getValue().toString().contains("Cost")) {  //Cheapest
                 System.out.println("Cheapest First");
             } else if (algorithmType.getValue().toString().contains("Beam")) {  //Beam
@@ -952,6 +1007,7 @@ public class GSAA extends Application {
         primaryStage.show();
     }
 
+    //=============================
     private void AStarSearch() {
         Path p = getMinPath();
         if (stopFlag) {
@@ -1023,22 +1079,26 @@ public class GSAA extends Application {
     }
 
     //=============================
-    private void DepthFirst(int level) {
+    private void DepthAndBreadth(int level, boolean front) {
         Path p = null;
         do {
             if (paths.size() >= 1) {
-                paths.get(0).visit();
                 p = paths.get(0);
-            }/*else{
-                p = null;
-            }*/
+                if (front) {
+                    paths.get(0).visit();
+                    if (GSAA.getTargetCity().getName().equals(p.getLastCity())) {
+                        return ;
+                    }
+                }
+            }
+
             if (stopFlag) {
                 return;
             }
-            int res = expandPath(p, true);
+            int res = expandPath(p, front);
             if (res == 0) {
                 return;
-            } else if (res == -1) {
+            } else if (res == -1 && front) {
                 if (paths.size() >= 1) {
                     paths.remove(0);
                 }
@@ -1062,7 +1122,7 @@ public class GSAA extends Application {
 
     private void cleanPaths(int level) {
         for (int i = 0; i < paths.size(); i++) {
-            if (paths.get(i).getPath().size() >= level) {
+            if (paths.get(i).getPath().size() >= level && !paths.get(i).getLastCity().equals(GSAA.getTargetCity().getName())) {
                 paths.get(i).leave();
                 paths.remove(i);
                 i--;
@@ -1079,7 +1139,7 @@ public class GSAA extends Application {
         }
         return true;
     }
-    
+
     //=============================
     public static boolean isInteger(String s) {
         try {
@@ -1131,7 +1191,7 @@ public class GSAA extends Application {
     }
 
     //=============================
-    private boolean expandPath(Path p) {
+    private boolean expandPath(Path p) {    // A Star expansion
         boolean edited = false;
         if (p != null) {
             Path p2 = new Path(p);
@@ -1187,24 +1247,18 @@ public class GSAA extends Application {
     }
 
     //=============================
-    private int expandPath(Path p, boolean Front) {
-        int addPos = 1; // add front
-        if (!Front) {
-            addPos = paths.size() - 1;        //add back
-        }
+    private int expandPath(Path p, boolean front) {     // Front true -> for Depth otherwise it is breadth
         int edited = -1;
         if (p != null) {
             Path p2;
-            if (Front) {
+            if (front) {
                 p2 = new Path(p);
-            } else {
+            } else {            //Breadth First
                 p2 = new Path(p);
-//                paths.remove(addPos);
+                paths.remove(0);    //remove the first path
+                p2.visit();
             }
             for (int i = 0; i < links.size(); i++) {
-                if (!Front) {
-                    addPos = paths.size();        //add back
-                }
                 if (links.get(i).getKey().contains(p2.getLastCity())) {
                     int pos = 0;    //specify the city name to which the last city is linked
                     String[] linkCities = links.get(i).getKey().split(",");
@@ -1215,7 +1269,7 @@ public class GSAA extends Application {
                         pos = 1;
                     }
                     if (!checkExtended(linkCities[pos])) {
-                        if (Front && edited == -1) {
+                        if (front && edited == -1) {
                             p.addLink(links.get(i), linkCities[pos]);
                             visitLink(links.get(i));
                             edited = 1;
@@ -1224,16 +1278,22 @@ public class GSAA extends Application {
                                 p.visit();
                                 return 0;
                             }
-                        } else if (Front && edited == 1) {
+                        } else if (front && edited == 1) {
                             Path p3 = new Path(p2);
                             p3.addLink(links.get(i), linkCities[pos]);
                             paths.add(1, p3);
+                        } else if (!front) {
+                            edited = 1;
+                            Path p3 = new Path(p2);
+                            p3.addLink(links.get(i), linkCities[pos]);
+                            paths.add(p3);
+                            extendedCities.add(linkCities[pos]);        // mark as visited
                             if (GSAA.getTargetCity().getName().equals(p3.getLastCity())) {
                                 p3.visit();
                                 return 0;
                             }
+                            visitLink(links.get(i));
                         }
-//                        visitLink(links.get(i));
                     }
                 }
             }
@@ -1242,9 +1302,6 @@ public class GSAA extends Application {
             return edited;
         } else {
             for (int i = 0; i < links.size(); i++) {
-                if (!Front) {
-                    addPos = paths.size();
-                }
                 if (links.get(i).getKey().contains(GSAA.getStartCity().getName())) {
                     int pos = 0;    //specify the city name to which the last city is linked
                     String[] linkCities = links.get(i).getKey().split(",");
@@ -1256,15 +1313,16 @@ public class GSAA extends Application {
                     }
                     Path p3 = new Path();
                     p3.addLink(links.get(i), linkCities[pos]);
-                    if (edited == -1) {
+                    if (edited == -1 || !front) {   //first path added or breadth add at last
                         paths.add(p3);
-                    } else {
-                        paths.add(addPos, p3);
-                    }
-                    if (edited == -1 || !Front) {
                         visitLink(links.get(i));
+                        if (!front) {                 // add visited cities not just extended
+                            extendedCities.add(linkCities[pos]);
+                        }
+                        edited = 1;
+                    } else {
+                        paths.add(1, p3);
                     }
-                    edited = 1;
                     if (GSAA.getTargetCity().getName().equals(p3.getLastCity())) {
                         return 0;
                     }
@@ -1274,8 +1332,8 @@ public class GSAA extends Application {
                 extendedCities.add(GSAA.getStartCity().getName());
             }
 //            System.out.println("EDITED = "+edited);
-            if (paths.size() >= 1) {
-                paths.get(addPos - 1).leave();
+            if (paths.size() >= 1 && front) {
+                paths.get(0).leave();
             }
             return edited;
         }
