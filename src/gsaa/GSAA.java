@@ -52,7 +52,7 @@ public class GSAA extends Application {
 
     private static City start;
     private static City target;
-
+    private static String lastChoice = " ";
     private boolean stopFlag;
 //    private Path p;
 //    private EventHandler<ActionEvent> event;
@@ -182,8 +182,24 @@ public class GSAA extends Application {
                     links.get(i).setDisable(true);
                 }
             }
-            if (getMinPath() != null) {
-                getMinPath().leave();
+            switch (lastChoice) {
+                case "A*":
+                    if (getMinPath() != null) {
+                        getMinPath().leave();
+                    }
+                    break;
+                case "DFS":
+                    if (paths.size() >= 1) {
+                        paths.get(0).leave();
+                    }
+                    break;
+                case "DLS":
+                    if (paths.size() >= 1) {
+                        paths.get(0).leave();
+                    }
+                    break;
+                default:
+                    break;
             }
             if (!paths.isEmpty() && !stopFlag) {
                 paths.clear();
@@ -202,8 +218,9 @@ public class GSAA extends Application {
             algorithmType.setDisable(true);
             //pane.setDisable(true);
             if (algorithmType.getValue().toString().contains("A*")) {   //A*
+                lastChoice = "A*";
                 runThread = new Thread(() -> {
-                    DepthFirst();
+                    AStarSearch();
                     if (!stopFlag) {
                         pane.setDisable(false);
                         buttonNew.setDisable(false);
@@ -254,8 +271,9 @@ public class GSAA extends Application {
                     alert.showAndWait();
                     return;
                 }
+                lastChoice = "DFS";
                 runThread = new Thread(() -> {
-                    AStarSearch();
+                    DepthFirst(0);
                     if (!stopFlag) {
                         pane.setDisable(false);
                         buttonNew.setDisable(false);
@@ -278,7 +296,116 @@ public class GSAA extends Application {
                 });
                 runThread.start();
             } else if (algorithmType.getValue().toString().contains("DLS")) {   // Depth limited
-                System.out.println("Depth limited");
+                if (GSAA.getTargetCity() == null) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("No target City!");
+                    alert.setContentText("Sorry but There is no target City\n"
+                            + " Please Specify it first by clicking it");
+                    GridPane g = (GridPane) alert.getDialogPane().lookup(".header-panel");
+                    g.setStyle("-fx-background-color: #E8E8E8");
+                    ButtonBar btnBar = (ButtonBar) alert.getDialogPane().lookup(".button-bar");
+                    btnBar.setStyle("-fx-background-color: #E8E8E8");
+                    btnBar.getButtons().forEach(b -> b.setStyle("-fx-background-color: "
+                            + "#090a0c,"
+                            + "linear-gradient(#38424b 0%, #1f2429 20%, #191d22 100%),"
+                            + "linear-gradient(#20262b, #191d22),"
+                            + "radial-gradient(center 50% 0%, radius 100%, rgba(114,131,148,0.9), rgba(255,255,255,0));"
+                            + "-fx-background-radius: 5,4,3,5;"
+                            + "-fx-background-insets: 0,1,2,0;"
+                            + "-fx-text-fill: white;"
+                            + "-fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );"
+                            + "-fx-font-family: \"Arial\";"
+                            + "-fx-text-fill: linear-gradient(white, #d0d0d0);"
+                            + "-fx-font-size: 12px;"
+                            + "-fx-padding: 10 20 10 20;"
+                            + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
+                    alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");
+                    alert.showAndWait();
+                    return;
+                }
+                Dialog<String> dialog = new Dialog<>();
+                dialog.setTitle("Enter The level");
+                // Set the button types.
+                ButtonType enterButtonType = new ButtonType("Submit", ButtonBar.ButtonData.OK_DONE);
+                dialog.getDialogPane().getButtonTypes().addAll(enterButtonType, ButtonType.CANCEL);
+
+                GridPane gridPane = new GridPane();
+                gridPane.setHgap(5);
+                gridPane.setVgap(5);
+                gridPane.setPadding(new Insets(10, 10, 10, 10));
+
+                TextField cost = new TextField();
+                cost.setPromptText(" Level number > 0");
+                cost.selectAll();
+                gridPane.add(new Label(" Max level : "), 0, 0);
+                gridPane.add(cost, 1, 0);
+                gridPane.setStyle("-fx-background-color: #E8E8E8");
+                ButtonBar btnBar = (ButtonBar) dialog.getDialogPane().lookup(".button-bar");
+                btnBar.setStyle("-fx-background-color: #E8E8E8");
+                btnBar.getButtons().forEach(b -> b.setStyle("-fx-background-color: "
+                        + "#090a0c,"
+                        + "linear-gradient(#38424b 0%, #1f2429 20%, #191d22 100%),"
+                        + "linear-gradient(#20262b, #191d22),"
+                        + "radial-gradient(center 50% 0%, radius 100%, rgba(114,131,148,0.9), rgba(255,255,255,0));"
+                        + "-fx-background-radius: 5,4,3,5;"
+                        + "-fx-background-insets: 0,1,2,0;"
+                        + "-fx-text-fill: white;"
+                        + "-fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );"
+                        + "-fx-font-family: \"Arial\";"
+                        + "-fx-text-fill: linear-gradient(white, #d0d0d0);"
+                        + "-fx-font-size: 12px;"
+                        + "-fx-padding: 10 20 10 20;"
+                        + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
+//                      
+                dialog.getDialogPane().setContent(gridPane);
+
+                // Request focus on the cost field by default.
+                Platform.runLater(() -> cost.requestFocus());
+
+                Node enterButton = dialog.getDialogPane().lookupButton(enterButtonType);
+                enterButton.setDisable(true);
+
+                cost.textProperty().addListener((observable, oldValue, newValue) -> {
+
+                    enterButton.setDisable(!GSAA.isInteger(newValue) || Integer.parseInt(newValue) < 1);
+                });
+
+                // Convert the result to String when the login button is clicked.
+                dialog.setResultConverter(dialogButton -> {
+                    if (dialogButton == enterButtonType) {
+                        return cost.getText();
+                    }
+                    return null;
+                });
+
+                Optional<String> result = dialog.showAndWait();
+
+                result.ifPresent(pair -> {
+                    lastChoice = "DLS";
+                    runThread = new Thread(() -> {
+                    DepthFirst(Integer.parseInt(pair));
+                        if (!stopFlag) {
+                            pane.setDisable(false);
+                            buttonNew.setDisable(false);
+                            buttonSave.setDisable(false);
+                            buttonOpen.setDisable(false);
+                            buttonPause.setDisable(true);
+                            buttonStop.setDisable(true);
+                            buttonGenerateH.setDisable(false);
+                            buttonSolve.setDisable(false);
+                            algorithmType.setDisable(false);
+                            for (int i = 0; i < cities.size() || i < links.size(); i++) {
+                                if (i < cities.size()) {
+                                    cities.get(i).setDisable(false);
+                                }
+                                if (i < links.size()) {
+                                    links.get(i).setDisable(false);
+                                }
+                            }
+                        }
+                    });
+                    runThread.start();
+                });
             } else if (algorithmType.getValue().toString().contains("BFS")) {   //Breadth
                 System.out.println("Breadth");
             } else if (algorithmType.getValue().toString().contains("Cost")) {  //Cheapest
@@ -896,17 +1023,30 @@ public class GSAA extends Application {
     }
 
     //=============================
-    private void DepthFirst() {
+    private void DepthFirst(int level) {
         Path p = null;
-        if (paths.size() > 0) {
-            p = paths.get(0);
-        }
-        if (stopFlag) {
-            if (p != null) {
-                p.visit();
+        do {
+            if (paths.size() >= 1) {
+                paths.get(0).visit();
+                p = paths.get(0);
+            }/*else{
+                p = null;
+            }*/
+            if (stopFlag) {
+                return;
             }
-            return;
-        }
+            int res = expandPath(p, true);
+            if (res == 0) {
+                return;
+            } else if (res == -1) {
+                if (paths.size() >= 1) {
+                    paths.remove(0);
+                }
+            }
+            if (level > 0) {
+                cleanPaths(level);
+            }
+        } while (paths.size() >= 1);
 
     }
 
@@ -920,10 +1060,30 @@ public class GSAA extends Application {
         return false;
     }
 
+    private void cleanPaths(int level) {
+        for (int i = 0; i < paths.size(); i++) {
+            if (paths.get(i).getPath().size() >= level) {
+                paths.get(i).leave();
+                paths.remove(i);
+                i--;
+            }
+        }
+    }
+
     //=============================
     public static boolean isDouble(String s) {
         try {
             Double.parseDouble(s);
+        } catch (NullPointerException | NumberFormatException e) {
+            return false;
+        }
+        return true;
+    }
+    
+    //=============================
+    public static boolean isInteger(String s) {
+        try {
+            Integer.parseInt(s);
         } catch (NullPointerException | NumberFormatException e) {
             return false;
         }
@@ -1028,13 +1188,22 @@ public class GSAA extends Application {
 
     //=============================
     private int expandPath(Path p, boolean Front) {
-        int addPos = 0;
+        int addPos = 1; // add front
+        if (!Front) {
+            addPos = paths.size() - 1;        //add back
+        }
         int edited = -1;
         if (p != null) {
-            Path p2 = new Path(p);
+            Path p2;
+            if (Front) {
+                p2 = new Path(p);
+            } else {
+                p2 = new Path(p);
+//                paths.remove(addPos);
+            }
             for (int i = 0; i < links.size(); i++) {
                 if (!Front) {
-                    addPos = paths.size();
+                    addPos = paths.size();        //add back
                 }
                 if (links.get(i).getKey().contains(p2.getLastCity())) {
                     int pos = 0;    //specify the city name to which the last city is linked
@@ -1046,20 +1215,30 @@ public class GSAA extends Application {
                         pos = 1;
                     }
                     if (!checkExtended(linkCities[pos])) {
-                        if (edited == -1) {
+                        if (Front && edited == -1) {
                             p.addLink(links.get(i), linkCities[pos]);
+                            visitLink(links.get(i));
                             edited = 1;
                             extendedCities.add(p2.getLastCity());
-                        } else {
+                            if (GSAA.getTargetCity().getName().equals(p.getLastCity())) {
+                                p.visit();
+                                return 0;
+                            }
+                        } else if (Front && edited == 1) {
                             Path p3 = new Path(p2);
                             p3.addLink(links.get(i), linkCities[pos]);
-                            paths.add(p3);
+                            paths.add(1, p3);
+                            if (GSAA.getTargetCity().getName().equals(p3.getLastCity())) {
+                                p3.visit();
+                                return 0;
+                            }
                         }
-                        visitLink(links.get(i));
+//                        visitLink(links.get(i));
                     }
                 }
             }
             p2 = null;
+            p.leave();
             return edited;
         } else {
             for (int i = 0; i < links.size(); i++) {
@@ -1075,11 +1254,17 @@ public class GSAA extends Application {
                     if (!linkCities[0].equals(GSAA.getStartCity().getName()) && !linkCities[1].equals(GSAA.getStartCity().getName())) {
                         continue;
                     }
-                    edited = 1;
                     Path p3 = new Path();
                     p3.addLink(links.get(i), linkCities[pos]);
-                    paths.add(addPos, p3);
-                    visitLink(links.get(i));
+                    if (edited == -1) {
+                        paths.add(p3);
+                    } else {
+                        paths.add(addPos, p3);
+                    }
+                    if (edited == -1 || !Front) {
+                        visitLink(links.get(i));
+                    }
+                    edited = 1;
                     if (GSAA.getTargetCity().getName().equals(p3.getLastCity())) {
                         return 0;
                     }
@@ -1087,6 +1272,10 @@ public class GSAA extends Application {
             }
             if (edited == 1) {
                 extendedCities.add(GSAA.getStartCity().getName());
+            }
+//            System.out.println("EDITED = "+edited);
+            if (paths.size() >= 1) {
+                paths.get(addPos - 1).leave();
             }
             return edited;
         }
