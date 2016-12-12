@@ -57,14 +57,16 @@ public class City extends Button {
         this.name = name;
         this.heuristicValue = heuristicValue;
         this.labelName = new Label(name);
-        this.labelName.setStyle("-fx-background-color: #F5F5DC");
+//        this.labelName.setStyle("-fx-background-color: #F5F5DC");
+        this.labelName.getStylesheets().add("./StylingCSS/styles.css");
+        this.labelName.setId("background");
         this.labelName.layoutXProperty().bind(this.layoutXProperty().add(12));
         this.labelName.layoutYProperty().bind(this.layoutYProperty());
         this.labelName.prefHeight(-1);
         this.labelName.prefWidth(-1);
         pane.getChildren().add(this);
         pane.getChildren().add(this.labelName);
-        this.getStylesheets().add("./StylingCSS/City.css");
+        this.getStylesheets().add("./StylingCSS/styles.css");
         this.setId("defaultCity");
         this.setOnAction(e -> {
             if (!dragEntered) {

@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.Random;
@@ -58,7 +57,6 @@ public class GSAA extends Application {
 
     private final ArrayList<Path> paths = new ArrayList<Path>();
     private final ArrayList<String> extendedCities = new ArrayList<String>();
-    private final ArrayList<String> extendedLastCities = new ArrayList<String>();
     private final static ArrayList<City> cities = new ArrayList<City>(20);
     private ArrayList<SerializableCityInfo> serializedCities = new ArrayList<SerializableCityInfo>(20);
     private ArrayList<SerializableLinkInfo> serializedLinks = new ArrayList<SerializableLinkInfo>(20);
@@ -67,6 +65,12 @@ public class GSAA extends Application {
         @Override
         public int compare(Link o1, Link o2) {
             return new Double(o1.getSlope()).compareTo(new Double(o2.getSlope()));
+        }
+    };
+    public final static Comparator<Path> pathCompare = new Comparator<Path>() {
+        @Override
+        public int compare(Path o1, Path o2) {
+            return new Double(o1.getLastHeuristic()).compareTo(new Double(o2.getLastHeuristic()));
         }
     };
 
@@ -167,14 +171,6 @@ public class GSAA extends Application {
                 alert.showAndWait();
                 return;
             }
-            for (int i = 0; i < cities.size() || i < links.size(); i++) {
-                if (i < cities.size()) {
-                    cities.get(i).setDisable(true);
-                }
-                if (i < links.size()) {
-                    links.get(i).setDisable(true);
-                }
-            }
             switch (lastChoice) {
                 case "A*":
                     if (getMinPath() != null) {
@@ -201,6 +197,16 @@ public class GSAA extends Application {
                         getMinPath().leave();
                     }
                     break;
+                case "Beam":
+                    if (paths.size() >= 1) {
+                        paths.get(paths.size() - 1).leave();
+                    }
+                    break;
+                case "Hill":
+                    if (paths.size() >= 1) {
+                        paths.get(paths.size() - 1).leave();
+                    }
+                    break;
                 default:
                     break;
             }
@@ -219,7 +225,7 @@ public class GSAA extends Application {
             buttonGenerateH.setDisable(true);
             buttonSolve.setDisable(true);
             algorithmType.setDisable(true);
-            //pane.setDisable(true);
+            pane.setDisable(true);
             if (algorithmType.getValue().toString().contains("A*")) {   //A*
                 lastChoice = "A*";
                 runThread = new Thread(() -> {
@@ -234,18 +240,9 @@ public class GSAA extends Application {
                         buttonGenerateH.setDisable(false);
                         buttonSolve.setDisable(false);
                         algorithmType.setDisable(false);
-                        for (int i = 0; i < cities.size() || i < links.size(); i++) {
-                            if (i < cities.size()) {
-                                cities.get(i).setDisable(false);
-                            }
-                            if (i < links.size()) {
-                                links.get(i).setDisable(false);
-                            }
-                        }
                     }
                 });
                 runThread.start();
-
             } else if (algorithmType.getValue().toString().contains("DFS")) {   //Depth first 
                 if (GSAA.getTargetCity() == null) {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -276,7 +273,7 @@ public class GSAA extends Application {
                 }
                 lastChoice = "DFS";
                 runThread = new Thread(() -> {
-                    DepthAndBreadth(0, true);
+                    DepthAndBreadth(0, true, 0);
                     if (!stopFlag) {
                         pane.setDisable(false);
                         buttonNew.setDisable(false);
@@ -287,14 +284,6 @@ public class GSAA extends Application {
                         buttonGenerateH.setDisable(false);
                         buttonSolve.setDisable(false);
                         algorithmType.setDisable(false);
-                        for (int i = 0; i < cities.size() || i < links.size(); i++) {
-                            if (i < cities.size()) {
-                                cities.get(i).setDisable(false);
-                            }
-                            if (i < links.size()) {
-                                links.get(i).setDisable(false);
-                            }
-                        }
                     }
                 });
                 runThread.start();
@@ -385,7 +374,7 @@ public class GSAA extends Application {
                 result.ifPresent(pair -> {
                     lastChoice = "DLS";
                     runThread = new Thread(() -> {
-                        DepthAndBreadth(Integer.parseInt(pair), true);
+                        DepthAndBreadth(Integer.parseInt(pair), true, 0);
                         if (!stopFlag) {
                             pane.setDisable(false);
                             buttonNew.setDisable(false);
@@ -396,14 +385,6 @@ public class GSAA extends Application {
                             buttonGenerateH.setDisable(false);
                             buttonSolve.setDisable(false);
                             algorithmType.setDisable(false);
-                            for (int i = 0; i < cities.size() || i < links.size(); i++) {
-                                if (i < cities.size()) {
-                                    cities.get(i).setDisable(false);
-                                }
-                                if (i < links.size()) {
-                                    links.get(i).setDisable(false);
-                                }
-                            }
                         }
                     });
                     runThread.start();
@@ -438,7 +419,7 @@ public class GSAA extends Application {
                 }
                 lastChoice = "BFS";
                 runThread = new Thread(() -> {
-                    DepthAndBreadth(0, false);  //false to specify Breadth
+                    DepthAndBreadth(0, false, 0);  //false to specify Breadth
                     if (!stopFlag) {
                         pane.setDisable(false);
                         buttonNew.setDisable(false);
@@ -449,14 +430,6 @@ public class GSAA extends Application {
                         buttonGenerateH.setDisable(false);
                         buttonSolve.setDisable(false);
                         algorithmType.setDisable(false);
-                        for (int i = 0; i < cities.size() || i < links.size(); i++) {
-                            if (i < cities.size()) {
-                                cities.get(i).setDisable(false);
-                            }
-                            if (i < links.size()) {
-                                links.get(i).setDisable(false);
-                            }
-                        }
                     }
                 });
                 runThread.start();
@@ -501,21 +474,100 @@ public class GSAA extends Application {
                         buttonGenerateH.setDisable(false);
                         buttonSolve.setDisable(false);
                         algorithmType.setDisable(false);
-                        for (int i = 0; i < cities.size() || i < links.size(); i++) {
-                            if (i < cities.size()) {
-                                cities.get(i).setDisable(false);
-                            }
-                            if (i < links.size()) {
-                                links.get(i).setDisable(false);
-                            }
-                        }
                     }
                 });
                 runThread.start();
             } else if (algorithmType.getValue().toString().contains("Beam")) {  //Beam
-                System.out.println("Beam Search");
+                Dialog<String> dialog = new Dialog<>();
+                dialog.setTitle("Enter The beam size");
+                // Set the button types.
+                ButtonType enterButtonType = new ButtonType("Submit", ButtonBar.ButtonData.OK_DONE);
+                dialog.getDialogPane().getButtonTypes().addAll(enterButtonType, ButtonType.CANCEL);
+
+                GridPane gridPane = new GridPane();
+                gridPane.setHgap(5);
+                gridPane.setVgap(5);
+                gridPane.setPadding(new Insets(10, 10, 10, 10));
+
+                TextField cost = new TextField();
+                cost.setPromptText(" size number > 1");
+                cost.selectAll();
+                gridPane.add(new Label(" Beam size : "), 0, 0);
+                gridPane.add(cost, 1, 0);
+                gridPane.setStyle("-fx-background-color: #E8E8E8");
+                ButtonBar btnBar = (ButtonBar) dialog.getDialogPane().lookup(".button-bar");
+                btnBar.setStyle("-fx-background-color: #E8E8E8");
+                btnBar.getButtons().forEach(b -> b.setStyle("-fx-background-color: "
+                        + "#090a0c,"
+                        + "linear-gradient(#38424b 0%, #1f2429 20%, #191d22 100%),"
+                        + "linear-gradient(#20262b, #191d22),"
+                        + "radial-gradient(center 50% 0%, radius 100%, rgba(114,131,148,0.9), rgba(255,255,255,0));"
+                        + "-fx-background-radius: 5,4,3,5;"
+                        + "-fx-background-insets: 0,1,2,0;"
+                        + "-fx-text-fill: white;"
+                        + "-fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );"
+                        + "-fx-font-family: \"Arial\";"
+                        + "-fx-text-fill: linear-gradient(white, #d0d0d0);"
+                        + "-fx-font-size: 12px;"
+                        + "-fx-padding: 10 20 10 20;"
+                        + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
+                dialog.getDialogPane().setContent(gridPane);
+                // Request focus on the cost field by default.
+                Platform.runLater(() -> cost.requestFocus());
+
+                Node enterButton = dialog.getDialogPane().lookupButton(enterButtonType);
+                enterButton.setDisable(true);
+
+                cost.textProperty().addListener((observable, oldValue, newValue) -> {
+
+                    enterButton.setDisable(!GSAA.isInteger(newValue) || Integer.parseInt(newValue) < 2);
+                });
+
+                // Convert the result to String when the login button is clicked.
+                dialog.setResultConverter(dialogButton -> {
+                    if (dialogButton == enterButtonType) {
+                        return cost.getText();
+                    }
+                    return null;
+                });
+
+                Optional<String> result = dialog.showAndWait();
+
+                result.ifPresent(pair -> {
+                    lastChoice = "Beam";
+                    runThread = new Thread(() -> {
+                        DepthAndBreadth(0, false, Integer.parseInt(pair));
+                        if (!stopFlag) {
+                            pane.setDisable(false);
+                            buttonNew.setDisable(false);
+                            buttonSave.setDisable(false);
+                            buttonOpen.setDisable(false);
+                            buttonPause.setDisable(true);
+                            buttonStop.setDisable(true);
+                            buttonGenerateH.setDisable(false);
+                            buttonSolve.setDisable(false);
+                            algorithmType.setDisable(false);
+                        }
+                    });
+                    runThread.start();
+                });
             } else if (algorithmType.getValue().toString().contains("Hill")) {  // Hill
-                System.out.println("Hill Climbing Search");
+                lastChoice = "Hill";
+                runThread = new Thread(() -> {
+                    DepthAndBreadth(0, false, 1);
+                    if (!stopFlag) {
+                        pane.setDisable(false);
+                        buttonNew.setDisable(false);
+                        buttonSave.setDisable(false);
+                        buttonOpen.setDisable(false);
+                        buttonPause.setDisable(true);
+                        buttonStop.setDisable(true);
+                        buttonGenerateH.setDisable(false);
+                        buttonSolve.setDisable(false);
+                        algorithmType.setDisable(false);
+                    }
+                });
+                runThread.start();
             }
         });
 
@@ -534,14 +586,6 @@ public class GSAA extends Application {
                 buttonGenerateH.setDisable(false);
                 buttonSolve.setDisable(false);
                 algorithmType.setDisable(false);
-                for (int i = 0; i < cities.size() || i < links.size(); i++) {
-                    if (i < cities.size()) {
-                        cities.get(i).setDisable(false);
-                    }
-                    if (i < links.size()) {
-                        links.get(i).setDisable(false);
-                    }
-                }
             }).start();
         });
 
@@ -566,7 +610,10 @@ public class GSAA extends Application {
             pane.getChildren().clear();
             cities.clear();
             serializedCities.clear();
+            extendedCities.clear();
             links.clear();
+            GSAA.setStartCity(null);
+            GSAA.setTargetCity(null);
         });
 
         buttonSave.setOnAction((ActionEvent event) -> {
@@ -808,9 +855,6 @@ public class GSAA extends Application {
         });
 
         pane.setOnMouseClicked((MouseEvent event) -> {
-            if (buttonSolve.isDisabled()) {
-                return;
-            }
             if (event.getButton().equals(MouseButton.PRIMARY)) {
                 long dif;
                 currentTime = System.currentTimeMillis();
@@ -1021,32 +1065,9 @@ public class GSAA extends Application {
         addOnOrder(links, linkCompare, new Link(92, 16, 18, pane));
         addOnOrder(links, linkCompare, new Link(87, 18, 19, pane));
 
-        /*int index = indexBinarySearch(links, linkCompare, new Link(75, cities, 0, 2, pane, primaryStage));
-        System.out.println("The index of zerind link is : " + index);
-        index = indexBinarySearch(links, linkCompare, new Link(118, cities, 0, 1, pane, primaryStage));
-        System.out.println("The index of Timisora link is : " + index);
-        index = indexBinarySearch(links, linkCompare, new Link(140, cities, 0, 3, pane, primaryStage));
-        System.out.println("The index of Sibiu link is : " + index);*/
-        pane.setOnMouseMoved(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                String msg
-                        = "(x: " + event.getX() + ", y: " + event.getY() + ") -- "
-                        + "(sceneX: " + event.getSceneX() + ", sceneY: " + event.getSceneY() + ") -- "
-                        + "(screenX: " + event.getScreenX() + ", screenY: " + event.getScreenY() + ")";
-
-                reporter.setText(msg);
-            }
-        });
-        pane.setOnMouseExited(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                reporter.setText("Outside the layout");
-            }
-        });
         //#FFE4C4 OR F5F5DC
-
-        pane.setStyle("-fx-background-color: #F5F5DC");
+        pane.getStylesheets().add("./StylingCSS/styles.css");
+        pane.setId("background");
         pane.getChildren().add(reporter);
         primaryStage.setMinHeight(308);
         primaryStage.setMinWidth(665);
@@ -1126,11 +1147,15 @@ public class GSAA extends Application {
     }
 
     //=============================
-    private void DepthAndBreadth(int level, boolean front) {
+    private void DepthAndBreadth(int level, boolean front, int numberExpanded) {
         Path p = null;
+        Path p2 = null;
         do {
             if (paths.size() >= 1) {
                 p = paths.get(0);
+                if (numberExpanded == 1 && !front) {//Hill climbing
+                    p2 = new Path(p);
+                }
                 if (front) {
                     paths.get(0).visit();
                     if (GSAA.getTargetCity().getName().equals(p.getLastCity())) {
@@ -1142,12 +1167,16 @@ public class GSAA extends Application {
             if (stopFlag) {
                 return;
             }
-            int res = expandPath(p, front);
+            int res = expandPath(p, front, numberExpanded);
             if (res == 0) {
                 return;
             } else if (res == -1 && front) {
                 if (paths.size() >= 1) {
                     paths.remove(0);
+                }
+            } else if (!front && numberExpanded == 1 && p2 != null) {
+                if (p2.getLastHeuristic() < paths.get(0).getLastHeuristic()) {
+                    return;
                 }
             }
             if (level > 0) {
@@ -1167,6 +1196,7 @@ public class GSAA extends Application {
         return false;
     }
 
+    //=============================
     private void cleanPaths(int level) {
         for (int i = 0; i < paths.size(); i++) {
             if (paths.get(i).getPath().size() >= level && !paths.get(i).getLastCity().equals(GSAA.getTargetCity().getName())) {
@@ -1242,7 +1272,7 @@ public class GSAA extends Application {
     }
 
     //=============================
-    private boolean expandPath(Path p, boolean realCost, boolean heuristic) {    // A Star expansion
+    private boolean expandPath(Path p, boolean realCost, boolean heuristic) {    // Cost based expansion
         boolean edited = false;
         if (p != null) {
             Path p2 = new Path(p);
@@ -1316,7 +1346,8 @@ public class GSAA extends Application {
     }
 
     //=============================
-    private int expandPath(Path p, boolean front) {     // Front true -> for Depth otherwise it is breadth
+    private int expandPath(Path p, boolean front, int numberExpanded) {     // Front true -> for Depth otherwise it is breadth
+        ArrayList<Path> sortedPaths = new ArrayList<Path>();                // numberExpanded for beam and Hill searches
         int edited = -1;
         if (p != null) {
             Path p2;
@@ -1351,7 +1382,7 @@ public class GSAA extends Application {
                             Path p3 = new Path(p2);
                             p3.addLink(links.get(i), linkCities[pos]);
                             paths.add(1, p3);
-                        } else if (!front) {
+                        } else if (!front && numberExpanded <= 0) {
                             edited = 1;
                             Path p3 = new Path(p2);
                             p3.addLink(links.get(i), linkCities[pos]);
@@ -1362,7 +1393,30 @@ public class GSAA extends Application {
                                 return 0;
                             }
                             visitLink(links.get(i));
+                        } else if (!front && numberExpanded > 0) {
+                            edited = 1;
+                            Path p3 = new Path(p2);
+                            p3.addLink(links.get(i), linkCities[pos]);
+                            addOnOrder(sortedPaths, pathCompare, p3);
                         }
+                    }
+                }
+            }
+            if (numberExpanded > 0 && edited == 1) {
+                extendedCities.add(p2.getLastCity());
+                for (int i = 0; i < sortedPaths.size() && i < numberExpanded; i++) {
+                    paths.add(sortedPaths.get(i));
+                    if (numberExpanded != 1) {
+                        visitLink(sortedPaths.get(i).getPath().get(sortedPaths.get(i).getPath().size() - 1));
+                    }else if(numberExpanded ==1 && p2.getLastHeuristic() >= paths.get(paths.size() -1).getLastHeuristic()){
+                        visitLink(sortedPaths.get(i).getPath().get(sortedPaths.get(i).getPath().size() - 1));
+                    }
+                    if (GSAA.getTargetCity() != null && GSAA.getTargetCity().getName().equals(sortedPaths.get(i).getLastCity())) {
+                        sortedPaths.get(i).visit();
+                        return 0;
+                    } else if (GSAA.getTargetCity() == null && sortedPaths.get(i).getLastHeuristic() == 0) {
+                        sortedPaths.get(i).visit();
+                        return 0;
                     }
                 }
             }
@@ -1383,16 +1437,20 @@ public class GSAA extends Application {
                     Path p3 = new Path();
                     p3.addLink(links.get(i), linkCities[pos]);
                     if (edited == -1 || !front) {   //first path added or breadth add at last
-                        paths.add(p3);
-                        visitLink(links.get(i));
-                        if (!front) {                 // add visited cities not just extended
+                        if (numberExpanded > 0) {
+                            addOnOrder(sortedPaths, pathCompare, p3);
+                        } else {
+                            paths.add(p3);
+                            visitLink(links.get(i));
+                        }
+                        if (numberExpanded <= 0 && !front) {                 // add visited cities not just extended
                             extendedCities.add(linkCities[pos]);
                         }
                         edited = 1;
                     } else {
                         paths.add(1, p3);
                     }
-                    if (GSAA.getTargetCity().getName().equals(p3.getLastCity())) {
+                    if (numberExpanded <= 0 && GSAA.getTargetCity().getName().equals(p3.getLastCity())) {
                         return 0;
                     }
                 }
@@ -1400,7 +1458,19 @@ public class GSAA extends Application {
             if (edited == 1) {
                 extendedCities.add(GSAA.getStartCity().getName());
             }
-//            System.out.println("EDITED = "+edited);
+            if (numberExpanded > 0) {
+                for (int i = 0; i < sortedPaths.size() && i < numberExpanded; i++) {
+                    paths.add(sortedPaths.get(i));
+                    visitLink(sortedPaths.get(i).getPath().get(sortedPaths.get(i).getPath().size() - 1));
+                    if (GSAA.getTargetCity() != null && GSAA.getTargetCity().getName().equals(sortedPaths.get(i).getLastCity())) {
+                        sortedPaths.get(i).visit();
+                        return 0;
+                    } else if (GSAA.getTargetCity() == null && sortedPaths.get(i).getLastHeuristic() == 0) {
+                        sortedPaths.get(i).visit();
+                        return 0;
+                    }
+                }
+            }
             if (paths.size() >= 1 && front) {
                 paths.get(0).leave();
             }
@@ -1523,6 +1593,16 @@ public class GSAA extends Application {
     public static int findCityIndex(City c) {
         for (int i = 0; i < cities.size(); i++) {
             if (c == cities.get(i)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    //=============================
+    public static int findCityIndex(String c) {
+        for (int i = 0; i < cities.size(); i++) {
+            if (c.equals(cities.get(i).getName())) {
                 return i;
             }
         }

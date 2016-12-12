@@ -42,7 +42,9 @@ public class Link extends Line {
         this.key = cities.get(sourceIndex).getName() + "," + cities.get(destinationIndex).getName();
         this.bindPosition(cities.get(sourceIndex), cities.get(destinationIndex));
         costLabel = new Label(String.valueOf(cost));
-        costLabel.setStyle("-fx-background-color: #F5F5DC");
+//        costLabel.setStyle("-fx-background-color: #F5F5DC");
+        this.costLabel.getStylesheets().add("./StylingCSS/styles.css");
+        this.costLabel.setId("background");
         costLabel.layoutXProperty().bind(this.startXProperty().add(this.endXProperty()).divide(2));
         costLabel.layoutYProperty().bind(this.startYProperty().add(this.endYProperty()).divide(2));
         pane.getChildren().add(0, costLabel);

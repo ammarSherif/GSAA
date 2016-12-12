@@ -58,3 +58,10 @@
     -fx-padding: 5 5 5 5;
     -fx-opacity:1.0;
 }
+#background{
+    -fx-background-color: #F5F5DC;
+}
+#background:disabled{
+    -fx-background-color: #F5F5DC;
+    -fx-opacity:1.0;
+}
