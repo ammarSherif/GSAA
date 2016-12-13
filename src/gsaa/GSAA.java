@@ -997,11 +997,11 @@ public class GSAA extends Application {
 
                         name.textProperty().addListener((observable, oldValue, newValue) -> {
                             if (isDouble(heuristicValue.getText().trim()) && Double.parseDouble(heuristicValue.getText().trim()) >= 0) {
-                                enterButton.setDisable(newValue.trim().isEmpty() || checkCity(newValue));
+                                enterButton.setDisable(newValue.trim().isEmpty() || checkCity(newValue.trim()));
                             }
                         });
                         heuristicValue.textProperty().addListener((observable, oldValue, newValue) -> {
-                            if (!name.getText().trim().isEmpty()) {
+                            if (!name.getText().trim().isEmpty() && !checkCity(name.getText().trim())) {
                                 enterButton.setDisable(!isDouble(newValue.trim()) || Double.parseDouble(newValue.trim()) < 0);
                             }
                         });
@@ -1041,8 +1041,10 @@ public class GSAA extends Application {
                     + " at Github : \n"
                     + "     https://github.com/ammarSherf/GSAA\n"
                     + "===============================\n"
-                    + "                                 Developped By\n"
-                    + "                                  Ammar Sherif ");
+                    + "This program is developped as a project for AI course\n"
+                    + " Faculty of Electronic Engineering 2016-2017\n\n"
+                    + "  Supervised by                  Developped By\n"
+                    + "  Ahmed Ghozia                    Ammar Sherif ");
             GridPane gb = (GridPane) alrt.getDialogPane().lookup(".header-panel");
             gb.setStyle("-fx-background-color: #E8E8E8");
             ButtonBar btnBr = (ButtonBar) alrt.getDialogPane().lookup(".button-bar");
