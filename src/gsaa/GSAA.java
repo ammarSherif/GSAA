@@ -29,10 +29,12 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -54,6 +56,9 @@ public class GSAA extends Application {
     private Thread runThread;
     private long lastTime = 0;
     private long currentTime = 0;
+    private Slider time = new Slider();
+    private final Label timing = new Label("Time per move : ");
+    private final Label timingValue = new Label();
 
     private final ArrayList<Path> paths = new ArrayList<Path>();
     private final ArrayList<String> extendedCities = new ArrayList<String>();
@@ -131,10 +136,32 @@ public class GSAA extends Application {
         algorithmControl.setContent(grid);
 
         TitledPane infoSection = new TitledPane();
-        infoSection.setText("Information while running the algorithm");
-        //AlgorithmInfo.setStyle(">.title{-fx-background-color : #3e3e3e}");
+        infoSection.setText("Suplementary Control");
+
         infoSection.setExpanded(false);
-        //infoSection.setCollapsible(false);
+
+        GridPane secondGrid = new GridPane();
+        secondGrid.setPadding(new Insets(10, 10, 10, 10));
+        secondGrid.setVgap(5);
+        secondGrid.setHgap(10);
+
+        time.setMin(350);
+        time.setMax(5350);
+        time.setValue(2500);
+
+        time.valueProperty().addListener(listener -> {
+            timingValue.setText(String.format("%.2f", time.getValue()));
+        });
+        time.setOnScroll((ScrollEvent event) -> {
+            time.setValue(time.getValue() + event.getDeltaY());
+        });
+        timingValue.setText(Double.toString(time.getValue()));
+
+        GridPane.setConstraints(timing, 0, 0);
+        GridPane.setConstraints(time, 1, 0);
+        GridPane.setConstraints(timingValue, 2, 0);
+        secondGrid.getChildren().setAll(timing, time, timingValue);
+        infoSection.setContent(secondGrid);
 
         BorderPane mainLayout = new BorderPane();
         Pane pane = new Pane();
@@ -216,17 +243,17 @@ public class GSAA extends Application {
             if (!extendedCities.isEmpty() && !stopFlag) {
                 extendedCities.clear();
             }
-            stopFlag = false;
-            buttonNew.setDisable(true);
-            buttonSave.setDisable(true);
-            buttonOpen.setDisable(true);
-            buttonPause.setDisable(false);
-            buttonStop.setDisable(false);
-            buttonGenerateH.setDisable(true);
-            buttonSolve.setDisable(true);
-            algorithmType.setDisable(true);
-            pane.setDisable(true);
             if (algorithmType.getValue().toString().contains("A*")) {   //A*
+                stopFlag = false;
+                buttonNew.setDisable(true);
+                buttonSave.setDisable(true);
+                buttonOpen.setDisable(true);
+                buttonPause.setDisable(false);
+                buttonStop.setDisable(false);
+                buttonGenerateH.setDisable(true);
+                buttonSolve.setDisable(true);
+                algorithmType.setDisable(true);
+                pane.setDisable(true);
                 lastChoice = "A*";
                 runThread = new Thread(() -> {
                     costSearch(true, true);
@@ -271,6 +298,16 @@ public class GSAA extends Application {
                     alert.showAndWait();
                     return;
                 }
+                stopFlag = false;
+                buttonNew.setDisable(true);
+                buttonSave.setDisable(true);
+                buttonOpen.setDisable(true);
+                buttonPause.setDisable(false);
+                buttonStop.setDisable(false);
+                buttonGenerateH.setDisable(true);
+                buttonSolve.setDisable(true);
+                algorithmType.setDisable(true);
+                pane.setDisable(true);
                 lastChoice = "DFS";
                 runThread = new Thread(() -> {
                     DepthAndBreadth(0, true, 0);
@@ -372,6 +409,16 @@ public class GSAA extends Application {
                 Optional<String> result = dialog.showAndWait();
 
                 result.ifPresent(pair -> {
+                    stopFlag = false;
+                    buttonNew.setDisable(true);
+                    buttonSave.setDisable(true);
+                    buttonOpen.setDisable(true);
+                    buttonPause.setDisable(false);
+                    buttonStop.setDisable(false);
+                    buttonGenerateH.setDisable(true);
+                    buttonSolve.setDisable(true);
+                    algorithmType.setDisable(true);
+                    pane.setDisable(true);
                     lastChoice = "DLS";
                     runThread = new Thread(() -> {
                         DepthAndBreadth(Integer.parseInt(pair), true, 0);
@@ -417,6 +464,16 @@ public class GSAA extends Application {
                     alert.showAndWait();
                     return;
                 }
+                stopFlag = false;
+                buttonNew.setDisable(true);
+                buttonSave.setDisable(true);
+                buttonOpen.setDisable(true);
+                buttonPause.setDisable(false);
+                buttonStop.setDisable(false);
+                buttonGenerateH.setDisable(true);
+                buttonSolve.setDisable(true);
+                algorithmType.setDisable(true);
+                pane.setDisable(true);
                 lastChoice = "BFS";
                 runThread = new Thread(() -> {
                     DepthAndBreadth(0, false, 0);  //false to specify Breadth
@@ -461,6 +518,16 @@ public class GSAA extends Application {
                     alert.showAndWait();
                     return;
                 }
+                stopFlag = false;
+                buttonNew.setDisable(true);
+                buttonSave.setDisable(true);
+                buttonOpen.setDisable(true);
+                buttonPause.setDisable(false);
+                buttonStop.setDisable(false);
+                buttonGenerateH.setDisable(true);
+                buttonSolve.setDisable(true);
+                algorithmType.setDisable(true);
+                pane.setDisable(true);
                 lastChoice = "UCost";
                 runThread = new Thread(() -> {
                     costSearch(true, false);
@@ -534,6 +601,16 @@ public class GSAA extends Application {
                 Optional<String> result = dialog.showAndWait();
 
                 result.ifPresent(pair -> {
+                    stopFlag = false;
+                    buttonNew.setDisable(true);
+                    buttonSave.setDisable(true);
+                    buttonOpen.setDisable(true);
+                    buttonPause.setDisable(false);
+                    buttonStop.setDisable(false);
+                    buttonGenerateH.setDisable(true);
+                    buttonSolve.setDisable(true);
+                    algorithmType.setDisable(true);
+                    pane.setDisable(true);
                     lastChoice = "Beam";
                     runThread = new Thread(() -> {
                         DepthAndBreadth(0, false, Integer.parseInt(pair));
@@ -552,6 +629,16 @@ public class GSAA extends Application {
                     runThread.start();
                 });
             } else if (algorithmType.getValue().toString().contains("Hill")) {  // Hill
+                stopFlag = false;
+                buttonNew.setDisable(true);
+                buttonSave.setDisable(true);
+                buttonOpen.setDisable(true);
+                buttonPause.setDisable(false);
+                buttonStop.setDisable(false);
+                buttonGenerateH.setDisable(true);
+                buttonSolve.setDisable(true);
+                algorithmType.setDisable(true);
+                pane.setDisable(true);
                 lastChoice = "Hill";
                 runThread = new Thread(() -> {
                     DepthAndBreadth(0, false, 1);
@@ -1249,7 +1336,7 @@ public class GSAA extends Application {
     private void visitLink(Link l) {
         l.visitLink();
         try {
-            Thread.sleep(2500);
+            Thread.sleep((long) time.getValue());
         } catch (InterruptedException ex) {
             l.leaveLink();
         }
@@ -1408,7 +1495,7 @@ public class GSAA extends Application {
                     paths.add(sortedPaths.get(i));
                     if (numberExpanded != 1) {
                         visitLink(sortedPaths.get(i).getPath().get(sortedPaths.get(i).getPath().size() - 1));
-                    }else if(numberExpanded ==1 && p2.getLastHeuristic() >= paths.get(paths.size() -1).getLastHeuristic()){
+                    } else if (numberExpanded == 1 && p2.getLastHeuristic() >= paths.get(paths.size() - 1).getLastHeuristic()) {
                         visitLink(sortedPaths.get(i).getPath().get(sortedPaths.get(i).getPath().size() - 1));
                     }
                     if (GSAA.getTargetCity() != null && GSAA.getTargetCity().getName().equals(sortedPaths.get(i).getLastCity())) {
