@@ -1080,7 +1080,7 @@ public class GSAA extends Application {
 
     private void intitialization(Stage primaryStage, Pane pane, Scene scene) {
 
-        final Label reporter = new Label("Outside the layout");
+//        final Label reporter = new Label("Outside the layout");
         //=====================================================
 
         //Label monitored = createMonitoredLabel(reporter);
@@ -1195,7 +1195,6 @@ public class GSAA extends Application {
         //#FFE4C4 OR F5F5DC
         pane.getStylesheets().add("./StylingCSS/styles.css");
         pane.setId("background");
-        pane.getChildren().add(reporter);
         primaryStage.setMinHeight(308);
         primaryStage.setMinWidth(665);
         primaryStage.setScene(scene);
