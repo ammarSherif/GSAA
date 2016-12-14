@@ -1080,9 +1080,8 @@ public class GSAA extends Application {
 
     private void intitialization(Stage primaryStage, Pane pane, Scene scene) {
 
-        final Label reporter = new Label("Outside the layout");
+//        final Label reporter = new Label("Outside the layout");
         //=====================================================
-
         //Label monitored = createMonitoredLabel(reporter);
         //Make your layout buttons + basic layout elements
         //=====================================================
@@ -1195,7 +1194,6 @@ public class GSAA extends Application {
         //#FFE4C4 OR F5F5DC
         pane.getStylesheets().add("./StylingCSS/styles.css");
         pane.setId("background");
-        pane.getChildren().add(reporter);
         primaryStage.setMinHeight(308);
         primaryStage.setMinWidth(665);
         primaryStage.setScene(scene);
@@ -1301,7 +1299,8 @@ public class GSAA extends Application {
                 if (paths.size() >= 1) {
                     paths.remove(0);
                     paths.get(0).visit();
-                    visitLink(paths.get(0).getPath().get(paths.get(0).getPath().size()-1));
+                    visitLink(paths.get(0).getPath().get(paths.get(0).getPath().size() - 1));
+                    paths.get(0).leave();
                 }
             } else if (!front && numberExpanded == 1 && p2 != null) {
                 if (p2.getLastHeuristic() < paths.get(0).getLastHeuristic()) {
@@ -1327,16 +1326,26 @@ public class GSAA extends Application {
 
     //=============================
     private void cleanPaths(int level) {
+        boolean flag = false;       //visit the last link of the new path
+        boolean change = false;     // change happened visit link at pos 0
         for (int i = 0; i < paths.size(); i++) {
             if (paths.get(i).getPath().size() >= level && !paths.get(i).getLastCity().equals(GSAA.getTargetCity().getName())) {
                 paths.get(i).visit();
-                if (i != 0) {
+                if (i != 0 || change) {
                     visitLink(paths.get(i).getPath().get(paths.get(i).getPath().size() - 1));
+                } else {
+                    flag = true;
                 }
                 paths.get(i).leave();
                 paths.remove(i);
+                change = true;
                 i--;
             }
+        }
+        if (flag && paths.size() >= 1) {
+            paths.get(0).visit();
+            visitLink(paths.get(0).getPath().get(paths.get(0).getPath().size() - 1));
+            paths.get(0).leave();
         }
     }
 
