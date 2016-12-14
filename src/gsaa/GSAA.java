@@ -1300,6 +1300,8 @@ public class GSAA extends Application {
             } else if (res == -1 && front) {
                 if (paths.size() >= 1) {
                     paths.remove(0);
+                    paths.get(0).visit();
+                    visitLink(paths.get(0).getPath().get(paths.get(0).getPath().size()-1));
                 }
             } else if (!front && numberExpanded == 1 && p2 != null) {
                 if (p2.getLastHeuristic() < paths.get(0).getLastHeuristic()) {
