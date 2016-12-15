@@ -1,6 +1,6 @@
 # GSAA [Graph Search Algorithm Analyzer] 
- as the name indicates GSAA is a program to analyze some of AI search techniques[Breadth First, Depth first, Depth limited, A Star, Cheapest first, Beam and Hill climbing],
-  it shows how different algorithms work on different graphs with good animation. 
+ as the name indicates GSAA is a program to analyze some of AI search techniques<br>[Breadth First, Depth first, Depth limited, A Star, Cheapest first, Beam and Hill climbing],<br>
+ it shows how different algorithms work on different graphs with good animation.<br> 
  It is basically for teaching and clarification purposes 
 
 # Features : 
