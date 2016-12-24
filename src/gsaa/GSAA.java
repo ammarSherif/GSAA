@@ -19,6 +19,7 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -145,6 +146,8 @@ public class GSAA extends Application {
         secondGrid.setVgap(5);
         secondGrid.setHgap(10);
 
+        Button buttonAbout = new Button("About");
+
         time.setMin(350);
         time.setMax(5350);
         time.setValue(2500);
@@ -160,8 +163,48 @@ public class GSAA extends Application {
         GridPane.setConstraints(timing, 0, 0);
         GridPane.setConstraints(time, 1, 0);
         GridPane.setConstraints(timingValue, 2, 0);
-        secondGrid.getChildren().setAll(timing, time, timingValue);
+        GridPane.setConstraints(buttonAbout, 60, 0);
+        secondGrid.getChildren().setAll(timing, time, timingValue, buttonAbout);
         infoSection.setContent(secondGrid);
+
+        buttonAbout.setOnAction(e -> {
+            Alert alrt = new Alert(Alert.AlertType.INFORMATION, "", ButtonType.OK);
+            alrt.setHeight(60);
+            alrt.setTitle("Information");
+            alrt.setContentText("Hope you enjoyed the experience,\n"
+                    + " This program will have some more improvements,\n"
+                    + " So if you have any advice or review\n"
+                    + " I would be grateful for your comments\n"
+                    + " Also You could explore the hole source code\n"
+                    + " at Github : \n"
+                    + "     https://github.com/ammarSherf/GSAA\n"
+                    + "===============================\n"
+                    + "This program is developped as a project for\nAI course,"
+                    + " Faculty of Electronic Engineering 2016-2017\n\n"
+                    + "  Supervised by                  Developped By\n"
+                    + "  Ahmed Ghozia                    Ammar Sherif ");
+            GridPane gb = (GridPane) alrt.getDialogPane().lookup(".header-panel");
+            gb.setStyle("-fx-background-color: #E8E8E8");
+            ButtonBar btnBr = (ButtonBar) alrt.getDialogPane().lookup(".button-bar");
+            btnBr.setStyle("-fx-background-color: #E8E8E8");
+            btnBr.getButtons().forEach(b -> b.setStyle("-fx-background-color: "
+                    + "#090a0c,"
+                    + "linear-gradient(#38424b 0%, #1f2429 20%, #191d22 100%),"
+                    + "linear-gradient(#20262b, #191d22),"
+                    + "radial-gradient(center 50% 0%, radius 100%, rgba(114,131,148,0.9), rgba(255,255,255,0));"
+                    + "-fx-background-radius: 5,4,3,5;"
+                    + "-fx-background-insets: 0,1,2,0;"
+                    + "-fx-text-fill: white;"
+                    + "-fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );"
+                    + "-fx-font-family: \"Arial\";"
+                    + "-fx-text-fill: linear-gradient(white, #d0d0d0);"
+                    + "-fx-font-size: 12px;"
+                    + "-fx-padding: 10 20 10 20;"
+                    + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
+            alrt.getDialogPane().setStyle("-fx-background-color: #E8E8E8");
+            alrt.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+            alrt.showAndWait();
+        });
 
         BorderPane mainLayout = new BorderPane();
         Pane pane = new Pane();
@@ -1028,46 +1071,6 @@ public class GSAA extends Application {
                 lastTime = currentTime;
             }
 
-        });
-        primaryStage.setOnCloseRequest(event -> {
-            Alert alrt = new Alert(Alert.AlertType.INFORMATION, "", ButtonType.OK);
-            alrt.setHeight(60);
-            alrt.setTitle("Information");
-            alrt.setContentText("Hope you enjoyed the experience,\n"
-                    + " This program will have some more improvements,\n"
-                    + " So if you have any advice or review\n"
-                    + " I would be grateful for your comments\n"
-                    + " Also You could explore the hole source code\n"
-                    + " at Github : \n"
-                    + "     https://github.com/ammarSherf/GSAA\n"
-                    + "===============================\n"
-                    + "This program is developped as a project for AI course\n"
-                    + " Faculty of Electronic Engineering 2016-2017\n\n"
-                    + "  Supervised by                  Developped By\n"
-                    + "  Ahmed Ghozia                    Ammar Sherif ");
-            GridPane gb = (GridPane) alrt.getDialogPane().lookup(".header-panel");
-            gb.setStyle("-fx-background-color: #E8E8E8");
-            ButtonBar btnBr = (ButtonBar) alrt.getDialogPane().lookup(".button-bar");
-            btnBr.setStyle("-fx-background-color: #E8E8E8");
-            btnBr.getButtons().forEach(b -> b.setStyle("-fx-background-color: "
-                    + "#090a0c,"
-                    + "linear-gradient(#38424b 0%, #1f2429 20%, #191d22 100%),"
-                    + "linear-gradient(#20262b, #191d22),"
-                    + "radial-gradient(center 50% 0%, radius 100%, rgba(114,131,148,0.9), rgba(255,255,255,0));"
-                    + "-fx-background-radius: 5,4,3,5;"
-                    + "-fx-background-insets: 0,1,2,0;"
-                    + "-fx-text-fill: white;"
-                    + "-fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );"
-                    + "-fx-font-family: \"Arial\";"
-                    + "-fx-text-fill: linear-gradient(white, #d0d0d0);"
-                    + "-fx-font-size: 12px;"
-                    + "-fx-padding: 10 20 10 20;"
-                    + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
-            alrt.getDialogPane().setStyle("-fx-background-color: #E8E8E8");
-            alrt.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-            alrt.showAndWait();
-            if (alrt.getResult() == ButtonType.OK) {
-            }
         });
 
         this.intitialization(primaryStage, pane, scene);
