@@ -11,3 +11,24 @@
 - You can change the speed of the excution of the algorithm
 - supports multigoal problems for heuristic based algorithms by specifying them with 0 heuristic. 
 - Include different Algorithms [Breadth First, Depth first, Depth limited, A*, Cheapest first, Beam and Hill climbing]
+
+# Screenshots of the program while running
+
+- the layout of the program after finding the path: 
+<p align="center">
+<img src="./after excution.png">
+</p>
+
+- available algorithms: 
+<p align="center">
+<img src="./available agorithms.png">
+</p>
+
+- changing position of nodes after openning saved graph: 
+<p align="center">
+<img src="./opening new graph and dragging nodes.png">
+</p>
+
+# New enhancements:
+ There would be new enhancements to UI and clearity of the code on July 2017.
+ 
