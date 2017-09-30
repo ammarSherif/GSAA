@@ -1,11 +1,7 @@
-/*
- *  
- */
 package gsaa;
 
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.Stack;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
@@ -21,43 +17,37 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
-import javafx.stage.Stage;
 import javafx.util.Pair;
 
 /**
- *
+ * The City class is represented as Buttons so that they can be pressed,
+ * dragged, ...etc.
+ * Also it keeps required data as its name, heuristic to target and associated label.
  * @author Ammar Sherif
  */
 public class City extends Button {
-
-    public static Pane getPane() {
-        return pane;
-    }
-
+    
     private String name;
     private double heuristicValue;
-    private Stage myPrimaryStage;
     private Label labelName;
     private static ArrayList<Link> links = GSAA.getLinks();
+    // lastTime : denotes last time this city was presses in milliseconds
     private long lastTime = 0;
-//    private static City lastClickedCity;
     private static Pane pane;
     private double x, y;
     private boolean dragEntered;
-//    private static int clickedCount = 0;
 
     /**
-     *
+     * this creates a new city and specify its behavior as a city,
+     * like possibility to be dragged, marked, and deleted
      * @param name name of the City
      * @param heuristicValue the heuristic value specified to the city
      */
-    public City(String name, double heuristicValue, Pane pane, Stage stg) {
-        this.myPrimaryStage = stg;
+    public City(String name, double heuristicValue, Pane pane) {
         City.pane = pane;
         this.name = name;
         this.heuristicValue = heuristicValue;
         this.labelName = new Label(name);
-//        this.labelName.setStyle("-fx-background-color: #F5F5DC");
         this.labelName.getStylesheets().add("./StylingCSS/styles.css");
         this.labelName.setId("background");
         this.labelName.layoutXProperty().bind(this.layoutXProperty().add(12));
@@ -70,15 +60,18 @@ public class City extends Button {
         this.setId("defaultCity");
         this.setOnAction(e -> {
             if (!dragEntered) {
-                inputInfo();
+                clickCity();
             }
         });
+        // get difference in x-axis and y-axis to add it later in all 
+        // calculations, e.g. moving
         this.setOnMousePressed(event -> {
             x = this.getLayoutX() - event.getSceneX();
             y = this.getLayoutY() - event.getSceneY();
         });
         this.setOnMouseDragged(event -> {
             if (event.getButton().equals(MouseButton.PRIMARY)) {
+                // erase marked cities as user would modify positions
                 if (GSAA.getStartCity() != null) {
                     GSAA.getStartCity().setDefaultShape();
                     GSAA.setStartCity(null);
@@ -87,6 +80,7 @@ public class City extends Button {
                     GSAA.getTargetCity().setDefaultShape();
                     GSAA.setTargetCity(null);
                 }
+                // unlock the city so that it can be moved freely
                 this.layoutXProperty().unbind();
                 this.layoutYProperty().unbind();
                 if ((event.getSceneX() + x) < pane.getWidth() && (event.getSceneX() + x) >= 0) {
@@ -102,6 +96,9 @@ public class City extends Button {
         this.setOnMouseReleased(event -> {
             if (dragEntered) {
                 this.setCursor(Cursor.DEFAULT);
+                // lock cities again so when the window maximized or minimized
+                // or there were any change the total shape would keep its own
+                // regardless of what was the exact position of cities
                 this.layoutXProperty().bind(pane.widthProperty().divide(pane.getWidth())
                         .multiply(this.getLayoutX()));
                 this.layoutYProperty().bind(pane.heightProperty().divide(pane.getHeight())
@@ -110,6 +107,7 @@ public class City extends Button {
             }
         });
         this.setOnMouseClicked(event -> {
+            // Means delete city + all paths to the city
             if (event.getButton().equals(MouseButton.SECONDARY)) {
                 if (GSAA.getStartCity() != null) {
                     GSAA.getStartCity().setDefaultShape();
@@ -134,37 +132,38 @@ public class City extends Button {
             }
         });
     }
-
+    //=============================
     public String getName() {
         return name;
     }
-
+    //=============================
     public double getHeuristicValue() {
         return heuristicValue;
     }
-
+    //=============================
     public void setName(String name) {
         this.name = name;
     }
-
-    /**
-     * Sets the heuristic value of the City.
-     *
-     * @param heuristicValue
-     */
+    //=============================
     public void setHeuristic(double heuristicValue) {
         this.heuristicValue = heuristicValue;
     }
-
+    //=============================
     public void setDefaultShape() {
+        // this sets the colors of city to its default, i.e. remove mark
         this.setId("defaultCity");
     }
     //=============================
-
-    private void inputInfo() {
+    /**
+     * this function specify the behavior of the city when clicked on by the 
+     * primary button of the mouse to <i>mark it</i>, <i>create a link</i>, or <i>modify its data</i>.
+     * 
+     */
+    private void clickCity() {
         long current = System.currentTimeMillis();
-        long dif = current - this.lastTime;
-        if (dif <= 215) {                           //Double click
+        long dif = current - this.lastTime;         // difference between this click and last one
+        if (dif <= 215) {                           //less than 215 milliseconds, i.e. Double click
+            // user wants to modify the data of the city
             if (GSAA.getStartCity() != null) {
                 GSAA.getStartCity().setDefaultShape();
                 GSAA.setStartCity(null);
@@ -184,16 +183,20 @@ public class City extends Button {
             gridPane.setVgap(5);
             gridPane.setPadding(new Insets(10, 10, 10, 10));
 
-            TextField name = new TextField();
-            name.setPromptText(" Name");
-            name.setText(this.name);
-            TextField heuristicValue = new TextField();
-            heuristicValue.setPromptText(" number >= 0");
-            heuristicValue.setText(String.valueOf(this.heuristicValue));
+            TextField textFieldName = new TextField();
+            textFieldName.setPromptText(" Name");
+            textFieldName.setText(this.name);
+            
+            TextField textFieldheuristicVal = new TextField();
+            textFieldheuristicVal.setPromptText(" number >= 0");
+            textFieldheuristicVal.setText(String.valueOf(this.heuristicValue));
+            
             gridPane.add(new Label("City Name : "), 0, 0);
-            gridPane.add(name, 1, 0);
+            gridPane.add(textFieldName, 1, 0);
             gridPane.add(new Label("Heuristic Value :"), 0, 1);
-            gridPane.add(heuristicValue, 1, 1);
+            gridPane.add(textFieldheuristicVal, 1, 1);
+            
+            /* Styling if needed
             gridPane.setStyle("-fx-background-color: #E8E8E8");
             ButtonBar btnBar = (ButtonBar) dialog.getDialogPane().lookup(".button-bar");
             btnBar.setStyle("-fx-background-color: #E8E8E8");
@@ -211,46 +214,47 @@ public class City extends Button {
                     + "-fx-font-size: 12px;"
                     + "-fx-padding: 10 20 10 20;"
                     + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
-
+*/
             dialog.getDialogPane().setContent(gridPane);
 
             // Request focus on the City name field by default.
             Platform.runLater(() -> {
-                heuristicValue.requestFocus();
-                heuristicValue.selectAll();
+                textFieldheuristicVal.requestFocus();
+                textFieldheuristicVal.selectAll();
             });
 
             Node enterButton = dialog.getDialogPane().lookupButton(enterButtonType);
             enterButton.setDisable(true);
-
-            name.textProperty().addListener((observable, oldValue, newValue) -> {
-                if (GSAA.isDouble(heuristicValue.getText().trim()) && Double.parseDouble(heuristicValue.getText().trim()) >= 0) {
+            // remains disabled if there is no appropriate heuristic or name
+            textFieldName.textProperty().addListener((observable, oldValue, newValue) -> {
+                if (GSAA.isDouble(textFieldheuristicVal.getText().trim()) && Double.parseDouble(textFieldheuristicVal.getText().trim()) >= 0) {
                     enterButton.setDisable(newValue.trim().isEmpty() || GSAA.checkCity(newValue));
                 }
             });
-            heuristicValue.textProperty().addListener((observable, oldValue, newValue) -> {
-                if (!name.getText().trim().isEmpty()) {
+            textFieldheuristicVal.textProperty().addListener((observable, oldValue, newValue) -> {
+                if (!textFieldName.getText().trim().isEmpty()) {
                     enterButton.setDisable(!GSAA.isDouble(newValue.trim()) || Double.parseDouble(newValue.trim()) < 0);
                 }
             });
             // Convert the result to a name and heuristtic pair when the enter button is clicked.
             dialog.setResultConverter(dialogButton -> {
                 if (dialogButton == enterButtonType) {
-                    name.setText(name.getText().trim());
-                    return new Pair<>(name.getText().trim(), heuristicValue.getText().trim());
+                    textFieldName.setText(textFieldName.getText().trim());
+                    return new Pair<>(textFieldName.getText().trim(), textFieldheuristicVal.getText().trim());
                 }
                 return null;
-
             });
-
+            // get the results from the dialog
             Optional<Pair<String, String>> result = dialog.showAndWait();
-
+            // if there is a result, change the specified data, i.e. name and heuristic
             result.ifPresent(pair -> {
                 this.labelName.setText(pair.getKey());
                 this.heuristicValue = Double.parseDouble(pair.getValue());
                 this.name = pair.getKey();
             });
-        } else if (GSAA.getStartCity() == this) {   // unmark it and make the target as a start
+        // single click on previously marked city
+        } else if (GSAA.getStartCity() == this) {   
+            // unmark it and make the target as a start city if present
             this.setDefaultShape();
             if (GSAA.getTargetCity() != null) {
                 GSAA.setStartCity(GSAA.getTargetCity());
@@ -261,12 +265,14 @@ public class City extends Button {
         } else if (GSAA.getTargetCity() == this) {  // it is the target just unmark it
             this.setDefaultShape();
             GSAA.setTargetCity(null);
-        } else if (GSAA.getStartCity() != null && GSAA.getTargetCity() != null) {  // Third City not Allowed
+        
+        } else if (GSAA.getStartCity() != null && GSAA.getTargetCity() != null) {  
+        // Third City not Allowed
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("More than two Cities");
             alert.setContentText("Sorry but there is already a target city\n"
-                    + " If you want to change it, firstly uncheck it.");
-            GridPane grid = (GridPane) alert.getDialogPane().lookup(".header-panel");
+                    + "If you want to change it, firstly uncheck it.");
+            /*GridPane grid = (GridPane) alert.getDialogPane().lookup(".header-panel");
             grid.setStyle("-fx-background-color: #E8E8E8");
             ButtonBar btnBar = (ButtonBar) alert.getDialogPane().lookup(".button-bar");
             btnBar.setStyle("-fx-background-color: #E8E8E8");
@@ -284,19 +290,22 @@ public class City extends Button {
                     + "-fx-font-size: 12px;"
                     + "-fx-padding: 10 20 10 20;"
                     + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
-            alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");
+            alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");*/
             alert.showAndWait();
-        } else if (GSAA.getStartCity() == null && GSAA.getTargetCity() == null) {  // no start => mark it
+        } else if (GSAA.getStartCity() == null && GSAA.getTargetCity() == null) {  
+            // no start => mark it
             GSAA.setStartCity(this);
             this.setId("markedCity");
         } else {          //There is some start and this is the target
             GSAA.setTargetCity(this);
             this.setId("markedCity");
-            // Make new link or mark start or target?
-            Alert alrt = new Alert(AlertType.CONFIRMATION, "You want to make a link?\n  No to specify start and end nodes",
+            // Make new link or mark as target?
+            Alert alrt = new Alert(AlertType.CONFIRMATION, "You want to make a link?\nNo to specify the target node",
                     ButtonType.YES, ButtonType.NO);
             alrt.setTitle("Confirm to make a link");
-            alrt.setContentText("You want to make a link?\n  No to specify start and end nodes");
+            alrt.setContentText("You want to make a link?\nNo to specify the target node");
+            /* Styling if needed
+            
             GridPane gb = (GridPane) alrt.getDialogPane().lookup(".header-panel");
             gb.setStyle("-fx-background-color: #E8E8E8");
             ButtonBar btnBr = (ButtonBar) alrt.getDialogPane().lookup(".button-bar");
@@ -315,14 +324,15 @@ public class City extends Button {
                     + "-fx-font-size: 12px;"
                     + "-fx-padding: 10 20 10 20;"
                     + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
-            alrt.getDialogPane().setStyle("-fx-background-color: #E8E8E8");
+            alrt.getDialogPane().setStyle("-fx-background-color: #E8E8E8");*/
             alrt.showAndWait();
             if (alrt.getResult() == ButtonType.YES) {     // make a link
                 if (checkLink()) {                        // Link is already existed
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Existing Link");
-                    alert.setContentText("Sorry but there is already a link between the cities");
-                    GridPane grid = (GridPane) alert.getDialogPane().lookup(".header-panel");
+                    alert.setContentText("Sorry but there is already a link between the cities\n"
+                            + "Note : you can edit it by double clicking on the link");
+                    /*GridPane grid = (GridPane) alert.getDialogPane().lookup(".header-panel");
                     grid.setStyle("-fx-background-color: #E8E8E8");
                     ButtonBar btnBar = (ButtonBar) alert.getDialogPane().lookup(".button-bar");
                     btnBar.setStyle("-fx-background-color: #E8E8E8");
@@ -341,7 +351,7 @@ public class City extends Button {
                             + "-fx-padding: 10 20 10 20;"
                             + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
 
-                    alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");
+                    alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");*/
                     alert.showAndWait();
                 } else {        // Link is not existed, Create it
                     Dialog<String> dialog = new Dialog<>();
@@ -359,7 +369,7 @@ public class City extends Button {
                     cost.setPromptText(" number >= 0");
                     gridPane.add(new Label(" Cost : "), 0, 0);
                     gridPane.add(cost, 1, 0);
-                    gridPane.setStyle("-fx-background-color: #E8E8E8");
+                    /*gridPane.setStyle("-fx-background-color: #E8E8E8");
                     ButtonBar btnBar = (ButtonBar) dialog.getDialogPane().lookup(".button-bar");
                     btnBar.setStyle("-fx-background-color: #E8E8E8");
                     btnBar.getButtons().forEach(b -> b.setStyle("-fx-background-color: "
@@ -376,15 +386,14 @@ public class City extends Button {
                             + "-fx-font-size: 12px;"
                             + "-fx-padding: 10 20 10 20;"
                             + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
-//                      
-                    dialog.getDialogPane().setContent(gridPane);
+                    */dialog.getDialogPane().setContent(gridPane);
 
                     // Request focus on the cost field by default.
                     Platform.runLater(() -> cost.requestFocus());
 
                     Node enterButton = dialog.getDialogPane().lookupButton(enterButtonType);
                     enterButton.setDisable(true);
-
+                    // disable submit button until entering a valid cost
                     cost.textProperty().addListener((observable, oldValue, newValue) -> {
 
                         enterButton.setDisable(!GSAA.isDouble(newValue) || Double.parseDouble(newValue) < 0);
@@ -412,7 +421,7 @@ public class City extends Button {
                             Alert alert = new Alert(Alert.AlertType.ERROR);
                             alert.setTitle("Error occured");
                             alert.setContentText("Sorry but some error occured");
-                            GridPane g = (GridPane) alert.getDialogPane().lookup(".header-panel");
+                            /*GridPane g = (GridPane) alert.getDialogPane().lookup(".header-panel");
                             g.setStyle("-fx-background-color: #E8E8E8");
                             ButtonBar btnBar2 = (ButtonBar) alert.getDialogPane().lookup(".button-bar");
                             btnBar2.setStyle("-fx-background-color: #E8E8E8");
@@ -431,7 +440,7 @@ public class City extends Button {
                                     + "-fx-padding: 10 20 10 20;"
                                     + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
                             alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");
-                            alert.showAndWait();
+                            */alert.showAndWait();
                         }
                     });
                 }
@@ -440,16 +449,21 @@ public class City extends Button {
                 GSAA.setStartCity(null);
                 GSAA.setTargetCity(null);                               // There would be no marked cities
             } else if (alrt.getResult() == ButtonType.NO) {
-                //Nothing to do as I setThe city as target before and marked it
+                //Nothing to do as I set the city as target before and marked it
             }
         }
         this.lastTime = current;
     }
     //=============================
-
+    /**
+     * this function is used to check whether there is a link between start 
+     * and target city and is used before <b>creating a new link</b> between the two cities
+     * so as not to create duplicate links
+     * @return boolean which is true if there is a link between start and target  
+     */
     public boolean checkLink() {
         for (int i = 0; i < links.size(); i++) {
-            if (links.get(i).getKey().contains(GSAA.getStartCity().name) && links.get(i).getKey().contains(GSAA.getTargetCity().getName())) {
+            if (links.get(i).getKey().contains(GSAA.getStartCity().getName()) && links.get(i).getKey().contains(GSAA.getTargetCity().getName())) {
                 return true;
             }
         }
@@ -457,12 +471,25 @@ public class City extends Button {
     }
 
     //=============================
-    public double distance(City c) {
-        double x = this.getLayoutX() - c.getLayoutX();
-        double y = this.getLayoutY() - c.getLayoutY();
+    /**
+     * this function gets the Euclidean distance between this city and the city 
+     * passed as a parameter
+     * @param target the city you want to measure the distance between it and this one
+     * @return double the Euclidean distance between this city and the city 'c'
+     */
+    public double distance(City target) {
+        double x = this.getLayoutX() - target.getLayoutX();
+        double y = this.getLayoutY() - target.getLayoutY();
         x *= x;
         y *= y;
         return Math.sqrt((x + y));
     }
-
+    //=============================
+    /**
+     * this function gets the the main pane where the cities are painted on
+     * @return Pane the pane of the cities
+     */
+    public static Pane getPane() {
+        return pane;
+    }
 }

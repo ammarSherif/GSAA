@@ -841,7 +841,7 @@ public class GSAA extends Application {
 
                     for (int i = 0; i < serializedCities.size(); i++) {
                         cities.add(new City(serializedCities.get(i).getCityName(), serializedCities.get(i).getHeuristicValue(),
-                                pane, primaryStage));
+                                pane));
                     }
                     for (int i = 0; i < cities.size(); i++) {
                         cities.get(i).layoutXProperty().bind(pane.widthProperty().divide(serializedCities.get(i).getxDivBind())
@@ -1060,7 +1060,7 @@ public class GSAA extends Application {
                         Optional<Pair<String, String>> result = dialog.showAndWait();
 
                         result.ifPresent(pair -> {
-                            cities.add(new City(pair.getKey(), Double.parseDouble(pair.getValue()), pane, primaryStage));
+                            cities.add(new City(pair.getKey(), Double.parseDouble(pair.getValue()), pane));
                             cities.get(cities.size() - 1).layoutXProperty().bind(pane.widthProperty().divide(pane.getWidth())
                                     .multiply(event.getX()));
                             cities.get(cities.size() - 1).layoutYProperty().bind(pane.heightProperty().divide(pane.getHeight())
@@ -1088,27 +1088,27 @@ public class GSAA extends Application {
         //Label monitored = createMonitoredLabel(reporter);
         //Make your layout buttons + basic layout elements
         //=====================================================
-        cities.add(new City("Arad", 366, pane, primaryStage));
-        cities.add(new City("Timisoara", 329, pane, primaryStage));
-        cities.add(new City("Zerind", 374, pane, primaryStage));
-        cities.add(new City("Sibiu", 253, pane, primaryStage));
-        cities.add(new City("Oradea", 380, pane, primaryStage));
-        cities.add(new City("Fagaras", 176, pane, primaryStage));
-        cities.add(new City("Riminicu Vilcea", 193, pane, primaryStage));
-        cities.add(new City("Lugoj", 244, pane, primaryStage));
-        cities.add(new City("Mehadia", 241, pane, primaryStage));
-        cities.add(new City("Craiova", 160, pane, primaryStage));
-        cities.add(new City("Dobreta", 242, pane, primaryStage));
-        cities.add(new City("Pitesti", 100, pane, primaryStage));
-        cities.add(new City("Bucharest", 0, pane, primaryStage));
+        cities.add(new City("Arad", 366, pane));
+        cities.add(new City("Timisoara", 329, pane));
+        cities.add(new City("Zerind", 374, pane));
+        cities.add(new City("Sibiu", 253, pane));
+        cities.add(new City("Oradea", 380, pane));
+        cities.add(new City("Fagaras", 176, pane));
+        cities.add(new City("Riminicu Vilcea", 193, pane));
+        cities.add(new City("Lugoj", 244, pane));
+        cities.add(new City("Mehadia", 241, pane));
+        cities.add(new City("Craiova", 160, pane));
+        cities.add(new City("Dobreta", 242, pane));
+        cities.add(new City("Pitesti", 100, pane));
+        cities.add(new City("Bucharest", 0, pane));
 
-        cities.add(new City("Giurgiu", 77, pane, primaryStage));
-        cities.add(new City("Urziceni", 80, pane, primaryStage));
-        cities.add(new City("Hirsova", 151, pane, primaryStage));
-        cities.add(new City("Vaslui", 199, pane, primaryStage));
-        cities.add(new City("Eforie", 161, pane, primaryStage));
-        cities.add(new City("Iasi", 226, pane, primaryStage));
-        cities.add(new City("Neamt", 234, pane, primaryStage));
+        cities.add(new City("Giurgiu", 77, pane));
+        cities.add(new City("Urziceni", 80, pane));
+        cities.add(new City("Hirsova", 151, pane));
+        cities.add(new City("Vaslui", 199, pane));
+        cities.add(new City("Eforie", 161, pane));
+        cities.add(new City("Iasi", 226, pane));
+        cities.add(new City("Neamt", 234, pane));
 
         cities.get(0).layoutXProperty().bind(pane.widthProperty().divide(475).multiply(47));
         cities.get(0).layoutYProperty().bind(pane.heightProperty().subtract(10).divide(110).multiply(31));
