@@ -1,6 +1,3 @@
-/*
- * 
- */
 package gsaa;
 
 import java.util.ArrayList;
@@ -23,75 +20,113 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
 
 /**
- *
+ * The Link class is represented as Lines, representing routes, that can be pressed,
+ * Also it keeps its cost and associated label to the link.
  * @author Ammar Sherif
  */
 public class Link extends Line {
 
     private double cost;
-    private int sourceIndex;
-    private int destinationIndex;
-    private static ArrayList<City> cities = GSAA.getCities();
+    private int firstIndex;
+    private int secondIndex;
+    // array of all cities in the program
+    private final static ArrayList<City> CITIES = GSAA.getCities();
+    // key is a distinct parameter of each link consists of names of the two CITIES
+    // separated by comma "," to distinguish links and know if somelink already exitsed
     private final String key;
     private final Label costLabel;
-
-    public Link(double cost, int sourceIndex, int destinationIndex, Pane pane) {
+    
+    /**
+     * this creates a new link between two CITIES 
+     * providing the ability to be deleted and linking the line to the specified CITIES
+     * @param cost cost of that route if taken
+     * @param firstIndex the index of the first city in array CITIES
+     * @param secondIndex the index of the second city 
+     * @param pane the pane to which the link would be added 
+     */
+    public Link(double cost, int firstIndex, int secondIndex, Pane pane) {
         this.cost = cost;
-        this.sourceIndex = sourceIndex;
-        this.destinationIndex = destinationIndex;
-        this.key = cities.get(sourceIndex).getName() + "," + cities.get(destinationIndex).getName();
-        this.bindPosition(cities.get(sourceIndex), cities.get(destinationIndex));
+        this.firstIndex = firstIndex;
+        this.secondIndex = secondIndex;
+        // set the key = firstCityName,secondCityName"
+        this.key = CITIES.get(firstIndex).getName() + "," + CITIES.get(secondIndex).getName();
+        // bind the link between the two cities, i.e. attach its start and end points to associated cities
+        this.bindPosition(CITIES.get(firstIndex), CITIES.get(secondIndex));
         costLabel = new Label(String.valueOf(cost));
-//        costLabel.setStyle("-fx-background-color: #F5F5DC");
         this.costLabel.getStylesheets().add("./StylingCSS/styles.css");
         this.costLabel.setId("background");
+        // put it in the middle
         costLabel.layoutXProperty().bind(this.startXProperty().add(this.endXProperty()).divide(2));
         costLabel.layoutYProperty().bind(this.startYProperty().add(this.endYProperty()).divide(2));
+        // add the label and the link note cost is added first 
+        // so it would be above the link
         pane.getChildren().add(0, costLabel);
         pane.getChildren().add(0, this);
+        // styling
         this.setStrokeLineCap(StrokeLineCap.ROUND);
         this.setStrokeLineJoin(StrokeLineJoin.ROUND);
         this.setStroke(Color.CORNFLOWERBLUE);
         this.setSmooth(true);
         this.setFill(Color.FLORALWHITE);
+        
         this.setOnMousePressed((MouseEvent e) -> {
             if (e.getButton().equals(MouseButton.PRIMARY)) {
+                // left click to modify the info
                 inputInfo();
             } else if (e.getButton().equals(MouseButton.SECONDARY)) {
-                pane.getChildren().remove(costLabel);
-                pane.getChildren().remove(this);
-                GSAA.getLinks().remove(this);
+                // right click remove this link and its label
+                this.delete(pane);
             }
         });
+        // modify the width
         this.leaveLink();
     }
-
+    /**
+     * increase the width of the line to indicate visiting it
+     */
     public void visitLink() {
         this.setStrokeWidth(6);
     }
-
+    /**
+     * delete this link and the associated label of the cost  from the pane
+     * @param pane the pane contains this link
+     */
     public void delete(Pane pane) {
         pane.getChildren().remove(costLabel);
         pane.getChildren().remove(this);
         GSAA.getLinks().remove(this);
     }
-
+    /**
+     * put the width to its normal value indicating leaving the link
+     */
     public void leaveLink() {
         this.setStrokeWidth(2);
     }
-
+    /**
+     * returns the cost of this link
+     * @return double value of the cost of this link
+     */
     public double getCost() {
         return cost;
     }
-
+    /**
+     * sets the cost of the link
+     * @param cost double value indicating cost of the route
+     */
     public void setCost(double cost) {
         this.cost = cost;
     }
-
+    /**
+     * gets the key that distinguish this specific link on the form <i>firstCityName,secondCityName</i>
+     * @return string value of the key which contains the cities which this line links separated by comma
+     */
     public String getKey() {
         return key;
     }
-
+    /**
+     * get the slope of the link
+     * @return double value indicating link's slope
+     */
     public double getSlope() {
         if (this.getStartX() > this.getEndX()) {
             return (this.getStartY() - this.getEndY()) / (this.getStartX() - this.getEndX());
@@ -99,9 +134,9 @@ public class Link extends Line {
             return (this.getEndY() - this.getStartY()) / (this.getEndX() - this.getStartX());
         }
     }
-
+    
+    
     private void inputInfo() {
-
         // Create a custom dialog.
         Dialog<String> dialog = new Dialog<>();
         dialog.setTitle("Enter Cost");
@@ -117,9 +152,11 @@ public class Link extends Line {
         TextField cost = new TextField();
         cost.setPromptText(" number >= 0");
         cost.setText(String.valueOf(this.cost));
+        // selects text for modification
         cost.selectAll();
         gridPane.add(new Label(" Cost : "), 0, 0);
         gridPane.add(cost, 1, 0);
+        /* Styling
         gridPane.setStyle("-fx-background-color: #E8E8E8");
         ButtonBar btnBar = (ButtonBar) dialog.getDialogPane().lookup(".button-bar");
         btnBar.setStyle("-fx-background-color: #E8E8E8");
@@ -137,7 +174,7 @@ public class Link extends Line {
                 + "-fx-font-size: 12px;"
                 + "-fx-padding: 10 20 10 20;"
                 + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
-//                      
+       */               
         dialog.getDialogPane().setContent(gridPane);
 
         // Request focus on the cost field by default.
@@ -145,7 +182,7 @@ public class Link extends Line {
 
         Node enterButton = dialog.getDialogPane().lookupButton(enterButtonType);
         enterButton.setDisable(true);
-
+        // eneable enter only when appropriate
         cost.textProperty().addListener((observable, oldValue, newValue) -> {
 
             enterButton.setDisable(!GSAA.isDouble(newValue) || Double.parseDouble(newValue) < 0);
@@ -158,7 +195,6 @@ public class Link extends Line {
                 return cost.getText();
             }
             return null;
-
         });
 
         Optional<String> result = dialog.showAndWait();
@@ -168,27 +204,32 @@ public class Link extends Line {
             this.cost = Double.parseDouble(pair);
         });
     }
-
-    private void bindPosition(final City start, final City end) {
-        this.startXProperty().bind(start.layoutXProperty().add(5));
-        this.startYProperty().bind(start.layoutYProperty().add(5));
-        this.endXProperty().bind(end.layoutXProperty().add(5));
-        this.endYProperty().bind(end.layoutYProperty().add(5));
+    /**
+     * attach the link to the associated cities so when they move,<br/>
+     * the link moves with them
+     * @param first denotes the first city
+     * @param second denotes the second city
+     */
+    private void bindPosition(final City first, final City second) {
+        this.startXProperty().bind(first.layoutXProperty().add(5));
+        this.startYProperty().bind(first.layoutYProperty().add(5));
+        this.endXProperty().bind(second.layoutXProperty().add(5));
+        this.endYProperty().bind(second.layoutYProperty().add(5));
     }
-
-    public int getSourceIndex() {
-        return sourceIndex;
+    
+    /**
+     * get the index of the first city within the Cities array
+     * @return the index of the first city of this link in the cities array
+     */
+    public int getFirstIndex() {
+        return firstIndex;
     }
-
-    public void setSourceIndex(int sourceIndex) {
-        this.sourceIndex = sourceIndex;
-    }
-
-    public int getDestinationIndex() {
-        return destinationIndex;
-    }
-
-    public void setDestinationIndex(int destinationIndex) {
-        this.destinationIndex = destinationIndex;
+    
+    /**
+     * get the index of the second city within the Cities array
+     * @return the index of the second city of this link in the cities array
+     */
+    public int getSecondIndex() {
+        return secondIndex;
     }
 }

@@ -84,7 +84,6 @@ public class GSAA extends Application {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
         launch(args);
     }
 
@@ -1381,8 +1380,8 @@ public class GSAA extends Application {
                     cities.get(i).getLayoutX(), pane.getWidth(), cities.get(i).getLayoutY(), pane.getHeight(), 0));
         }
         for (int i = 0; i < links.size(); i++) {
-            serializedLinks.add(new SerializableLinkInfo(links.get(i).getCost(), links.get(i).getSourceIndex(),
-                    links.get(i).getDestinationIndex()));
+            serializedLinks.add(new SerializableLinkInfo(links.get(i).getCost(), links.get(i).getFirstIndex(),
+                    links.get(i).getSecondIndex()));
         }
     }
     //=============================
@@ -1723,8 +1722,8 @@ public class GSAA extends Application {
 
     //=============================
     private double distanceLink(Link l) {
-        double x = cities.get(l.getDestinationIndex()).getLayoutX() - cities.get(l.getSourceIndex()).getLayoutX();
-        double y = cities.get(l.getDestinationIndex()).getLayoutY() - cities.get(l.getSourceIndex()).getLayoutY();
+        double x = cities.get(l.getSecondIndex()).getLayoutX() - cities.get(l.getFirstIndex()).getLayoutX();
+        double y = cities.get(l.getSecondIndex()).getLayoutY() - cities.get(l.getFirstIndex()).getLayoutY();
         x *= x;
         y *= y;
         return Math.sqrt((x + y));
