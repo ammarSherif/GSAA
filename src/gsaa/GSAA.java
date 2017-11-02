@@ -1,6 +1,3 @@
-/*
- *
- */
 package gsaa;
 
 import java.io.File;
@@ -17,9 +14,7 @@ import java.util.Random;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -45,6 +40,13 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 
 /**
+ * =============================================================================
+ * INFO this program is primarily for educational purposes, it analyzes
+ * different types of graph search algorithms, with a lot of features like : -
+ * creating graphs with portability by saving your own graphs and ability to
+ * share it - also pausing and resuming execution of any algorithm with
+ * different speeds. - automatic heuristic estimation
+ * =============================================================================
  *
  * @author Ammar Sherif
  */
@@ -95,7 +97,7 @@ public class GSAA extends Application {
         primaryStage.setTitle("Graph Search Algorithm Analyzer [GSAA]");
         final Label algChoose = new Label("Choose the Algorithm : ");
         final ComboBox algorithmType = new ComboBox();
-        algorithmType.getItems().setAll("A Start [A*]", "Depth First Search [DFS]",
+        algorithmType.getItems().setAll("A Star [A*]", "Depth First Search [DFS]",
                 "Depth Limited Search [DLS]", "Breadth First Search [BFS]", "Uniform Cost [Cheapest First]",
                 "Beam Search", "Hill Climbing Search");
         Button buttonSolve = new Button("Solve");
@@ -182,7 +184,7 @@ public class GSAA extends Application {
                     + " Faculty of Electronic Engineering 2016-2017\n\n"
                     + "  Supervised by                  Developped By\n"
                     + "  Ahmed Ghozia                    Ammar Sherif ");
-            GridPane gb = (GridPane) alrt.getDialogPane().lookup(".header-panel");
+            /*GridPane gb = (GridPane) alrt.getDialogPane().lookup(".header-panel");
             gb.setStyle("-fx-background-color: #E8E8E8");
             ButtonBar btnBr = (ButtonBar) alrt.getDialogPane().lookup(".button-bar");
             btnBr.setStyle("-fx-background-color: #E8E8E8");
@@ -200,7 +202,7 @@ public class GSAA extends Application {
                     + "-fx-font-size: 12px;"
                     + "-fx-padding: 10 20 10 20;"
                     + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
-            alrt.getDialogPane().setStyle("-fx-background-color: #E8E8E8");
+            alrt.getDialogPane().setStyle("-fx-background-color: #E8E8E8");*/
             alrt.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
             alrt.showAndWait();
         });
@@ -218,7 +220,7 @@ public class GSAA extends Application {
                 alert.setTitle("No start City!");
                 alert.setContentText("Sorry but There is no start City\n"
                         + " Please Specify it first by clicking it");
-                GridPane g = (GridPane) alert.getDialogPane().lookup(".header-panel");
+                /*GridPane g = (GridPane) alert.getDialogPane().lookup(".header-panel");
                 g.setStyle("-fx-background-color: #E8E8E8");
                 ButtonBar btnBar = (ButtonBar) alert.getDialogPane().lookup(".button-bar");
                 btnBar.setStyle("-fx-background-color: #E8E8E8");
@@ -236,7 +238,7 @@ public class GSAA extends Application {
                         + "-fx-font-size: 12px;"
                         + "-fx-padding: 10 20 10 20;"
                         + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
-                alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");
+                alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");*/
                 alert.showAndWait();
                 return;
             }
@@ -318,7 +320,7 @@ public class GSAA extends Application {
                     alert.setTitle("No target City!");
                     alert.setContentText("Sorry but There is no target City\n"
                             + " Please Specify it first by clicking it");
-                    GridPane g = (GridPane) alert.getDialogPane().lookup(".header-panel");
+                    /*GridPane g = (GridPane) alert.getDialogPane().lookup(".header-panel");
                     g.setStyle("-fx-background-color: #E8E8E8");
                     ButtonBar btnBar = (ButtonBar) alert.getDialogPane().lookup(".button-bar");
                     btnBar.setStyle("-fx-background-color: #E8E8E8");
@@ -336,7 +338,7 @@ public class GSAA extends Application {
                             + "-fx-font-size: 12px;"
                             + "-fx-padding: 10 20 10 20;"
                             + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
-                    alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");
+                    alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");*/
                     alert.showAndWait();
                     return;
                 }
@@ -372,7 +374,7 @@ public class GSAA extends Application {
                     alert.setTitle("No target City!");
                     alert.setContentText("Sorry but There is no target City\n"
                             + " Please Specify it first by clicking it");
-                    GridPane g = (GridPane) alert.getDialogPane().lookup(".header-panel");
+                    /*GridPane g = (GridPane) alert.getDialogPane().lookup(".header-panel");
                     g.setStyle("-fx-background-color: #E8E8E8");
                     ButtonBar btnBar = (ButtonBar) alert.getDialogPane().lookup(".button-bar");
                     btnBar.setStyle("-fx-background-color: #E8E8E8");
@@ -390,7 +392,7 @@ public class GSAA extends Application {
                             + "-fx-font-size: 12px;"
                             + "-fx-padding: 10 20 10 20;"
                             + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
-                    alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");
+                    alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");*/
                     alert.showAndWait();
                     return;
                 }
@@ -410,8 +412,8 @@ public class GSAA extends Application {
                 cost.selectAll();
                 gridPane.add(new Label(" Max level : "), 0, 0);
                 gridPane.add(cost, 1, 0);
-                gridPane.setStyle("-fx-background-color: #E8E8E8");
-                ButtonBar btnBar = (ButtonBar) dialog.getDialogPane().lookup(".button-bar");
+                //gridPane.setStyle("-fx-background-color: #E8E8E8");
+                /*ButtonBar btnBar = (ButtonBar) dialog.getDialogPane().lookup(".button-bar");
                 btnBar.setStyle("-fx-background-color: #E8E8E8");
                 btnBar.getButtons().forEach(b -> b.setStyle("-fx-background-color: "
                         + "#090a0c,"
@@ -426,7 +428,7 @@ public class GSAA extends Application {
                         + "-fx-text-fill: linear-gradient(white, #d0d0d0);"
                         + "-fx-font-size: 12px;"
                         + "-fx-padding: 10 20 10 20;"
-                        + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
+                        + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));*/
                 dialog.getDialogPane().setContent(gridPane);
 
                 // Request focus on the cost field by default.
@@ -484,7 +486,7 @@ public class GSAA extends Application {
                     alert.setTitle("No target City!");
                     alert.setContentText("Sorry but There is no target City\n"
                             + " Please Specify it first by clicking it");
-                    GridPane g = (GridPane) alert.getDialogPane().lookup(".header-panel");
+                    /*GridPane g = (GridPane) alert.getDialogPane().lookup(".header-panel");
                     g.setStyle("-fx-background-color: #E8E8E8");
                     ButtonBar btnBar = (ButtonBar) alert.getDialogPane().lookup(".button-bar");
                     btnBar.setStyle("-fx-background-color: #E8E8E8");
@@ -502,7 +504,7 @@ public class GSAA extends Application {
                             + "-fx-font-size: 12px;"
                             + "-fx-padding: 10 20 10 20;"
                             + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
-                    alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");
+                    alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");*/
                     alert.showAndWait();
                     return;
                 }
@@ -538,7 +540,7 @@ public class GSAA extends Application {
                     alert.setTitle("No target City!");
                     alert.setContentText("Sorry but There is no target City\n"
                             + " Please Specify it first by clicking it");
-                    GridPane g = (GridPane) alert.getDialogPane().lookup(".header-panel");
+                    /* GridPane g = (GridPane) alert.getDialogPane().lookup(".header-panel");
                     g.setStyle("-fx-background-color: #E8E8E8");
                     ButtonBar btnBar = (ButtonBar) alert.getDialogPane().lookup(".button-bar");
                     btnBar.setStyle("-fx-background-color: #E8E8E8");
@@ -556,7 +558,7 @@ public class GSAA extends Application {
                             + "-fx-font-size: 12px;"
                             + "-fx-padding: 10 20 10 20;"
                             + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
-                    alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");
+                    alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");*/
                     alert.showAndWait();
                     return;
                 }
@@ -603,7 +605,7 @@ public class GSAA extends Application {
                 cost.selectAll();
                 gridPane.add(new Label(" Beam size : "), 0, 0);
                 gridPane.add(cost, 1, 0);
-                gridPane.setStyle("-fx-background-color: #E8E8E8");
+                /* gridPane.setStyle("-fx-background-color: #E8E8E8");
                 ButtonBar btnBar = (ButtonBar) dialog.getDialogPane().lookup(".button-bar");
                 btnBar.setStyle("-fx-background-color: #E8E8E8");
                 btnBar.getButtons().forEach(b -> b.setStyle("-fx-background-color: "
@@ -619,7 +621,7 @@ public class GSAA extends Application {
                         + "-fx-text-fill: linear-gradient(white, #d0d0d0);"
                         + "-fx-font-size: 12px;"
                         + "-fx-padding: 10 20 10 20;"
-                        + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
+                        + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));*/
                 dialog.getDialogPane().setContent(gridPane);
                 // Request focus on the cost field by default.
                 Platform.runLater(() -> cost.requestFocus());
@@ -767,7 +769,7 @@ public class GSAA extends Application {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Error happened");
                     alert.setContentText("Sorry but some error happened during the operation");
-                    GridPane g = (GridPane) alert.getDialogPane().lookup(".header-panel");
+                    /*GridPane g = (GridPane) alert.getDialogPane().lookup(".header-panel");
                     g.setStyle("-fx-background-color: #E8E8E8");
                     ButtonBar btnBar = (ButtonBar) alert.getDialogPane().lookup(".button-bar");
                     btnBar.setStyle("-fx-background-color: #E8E8E8");
@@ -785,13 +787,13 @@ public class GSAA extends Application {
                             + "-fx-font-size: 12px;"
                             + "-fx-padding: 10 20 10 20;"
                             + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
-                    alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");
+                    alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");*/
                     alert.showAndWait();
                 } catch (IOException ex) {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Error happened");
                     alert.setContentText("Sorry but some error happened during the operation");
-                    GridPane g = (GridPane) alert.getDialogPane().lookup(".header-panel");
+                    /*GridPane g = (GridPane) alert.getDialogPane().lookup(".header-panel");
                     g.setStyle("-fx-background-color: #E8E8E8");
                     ButtonBar btnBar = (ButtonBar) alert.getDialogPane().lookup(".button-bar");
                     btnBar.setStyle("-fx-background-color: #E8E8E8");
@@ -809,7 +811,7 @@ public class GSAA extends Application {
                             + "-fx-font-size: 12px;"
                             + "-fx-padding: 10 20 10 20;"
                             + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
-                    alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");
+                    alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");*/
                     alert.showAndWait();
                 }
             }
@@ -856,7 +858,7 @@ public class GSAA extends Application {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Corrupted File");
                     alert.setContentText("Sorry but the file was corrupted");
-                    GridPane g = (GridPane) alert.getDialogPane().lookup(".header-panel");
+                    /*GridPane g = (GridPane) alert.getDialogPane().lookup(".header-panel");
                     g.setStyle("-fx-background-color: #E8E8E8");
                     ButtonBar btnBar = (ButtonBar) alert.getDialogPane().lookup(".button-bar");
                     btnBar.setStyle("-fx-background-color: #E8E8E8");
@@ -874,13 +876,13 @@ public class GSAA extends Application {
                             + "-fx-font-size: 12px;"
                             + "-fx-padding: 10 20 10 20;"
                             + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
-                    alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");
+                    alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");*/
                     alert.showAndWait();
                 } catch (IOException | ClassNotFoundException ex) {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Corrupted File");
                     alert.setContentText("Sorry but the file was corrupted");
-                    GridPane g = (GridPane) alert.getDialogPane().lookup(".header-panel");
+                    /*GridPane g = (GridPane) alert.getDialogPane().lookup(".header-panel");
                     g.setStyle("-fx-background-color: #E8E8E8");
                     ButtonBar btnBar = (ButtonBar) alert.getDialogPane().lookup(".button-bar");
                     btnBar.setStyle("-fx-background-color: #E8E8E8");
@@ -898,7 +900,7 @@ public class GSAA extends Application {
                             + "-fx-font-size: 12px;"
                             + "-fx-padding: 10 20 10 20;"
                             + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
-                    alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");
+                    alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");*/
                     alert.showAndWait();
                 }
             }
@@ -915,7 +917,7 @@ public class GSAA extends Application {
                     + "\n The heuristic is based on the euclidean distance"
                     + "\n  multiplied by some const generated according to\n  your graph."
                     + "\n Note 'no' to enter all heuristics one by one");
-            GridPane gb = (GridPane) alrt.getDialogPane().lookup(".header-panel");
+            /*GridPane gb = (GridPane) alrt.getDialogPane().lookup(".header-panel");
             gb.setStyle("-fx-background-color: #E8E8E8");
             ButtonBar btnBr = (ButtonBar) alrt.getDialogPane().lookup(".button-bar");
             btnBr.setStyle("-fx-background-color: #E8E8E8");
@@ -933,7 +935,7 @@ public class GSAA extends Application {
                     + "-fx-font-size: 12px;"
                     + "-fx-padding: 10 20 10 20;"
                     + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
-            alrt.getDialogPane().setStyle("-fx-background-color: #E8E8E8");
+            alrt.getDialogPane().setStyle("-fx-background-color: #E8E8E8");*/
             alrt.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
             alrt.showAndWait();
             if (alrt.getResult() == ButtonType.YES) {
@@ -942,7 +944,7 @@ public class GSAA extends Application {
                     alert.setTitle("No target");
                     alert.setContentText("Sorry but there is no target city\n"
                             + " I could not specify heuristic to no city.");
-                    GridPane g = (GridPane) alert.getDialogPane().lookup(".header-panel");
+                    /*GridPane g = (GridPane) alert.getDialogPane().lookup(".header-panel");
                     g.setStyle("-fx-background-color: #E8E8E8");
                     ButtonBar btnBar = (ButtonBar) alert.getDialogPane().lookup(".button-bar");
                     btnBar.setStyle("-fx-background-color: #E8E8E8");
@@ -960,7 +962,7 @@ public class GSAA extends Application {
                             + "-fx-font-size: 12px;"
                             + "-fx-padding: 10 20 10 20;"
                             + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
-                    alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");
+                    alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");*/
                     alert.showAndWait();
                 } else {
                     for (int i = 0; i < cities.size(); i++) {
@@ -1011,7 +1013,7 @@ public class GSAA extends Application {
                         gridPane.add(name, 1, 0);
                         gridPane.add(new Label("Heuristic Value :"), 0, 1);
                         gridPane.add(heuristicValue, 1, 1);
-                        gridPane.setStyle("-fx-background-color: #E8E8E8");
+                        /*gridPane.setStyle("-fx-background-color: #E8E8E8");
                         ButtonBar btnBar = (ButtonBar) dialog.getDialogPane().lookup(".button-bar");
                         btnBar.setStyle("-fx-background-color: #E8E8E8");
                         btnBar.getButtons().forEach(b -> b.setStyle("-fx-background-color: "
@@ -1027,7 +1029,7 @@ public class GSAA extends Application {
                                 + "-fx-text-fill: linear-gradient(white, #d0d0d0);"
                                 + "-fx-font-size: 12px;"
                                 + "-fx-padding: 10 20 10 20;"
-                                + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
+                                + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));*/
 //                      
                         dialog.getDialogPane().setContent(gridPane);
 
@@ -1087,7 +1089,7 @@ public class GSAA extends Application {
         //Label monitored = createMonitoredLabel(reporter);
         //Make your layout buttons + basic layout elements
         //=====================================================
-        cities.add(new City("Arad", 366, pane));
+        /*cities.add(new City("Arad", 366, pane));
         cities.add(new City("Timisoara", 329, pane));
         cities.add(new City("Zerind", 374, pane));
         cities.add(new City("Sibiu", 253, pane));
@@ -1191,8 +1193,47 @@ public class GSAA extends Application {
         addOnOrder(links, linkCompare, new Link(86, 15, 17, pane));
         addOnOrder(links, linkCompare, new Link(142, 14, 16, pane));
         addOnOrder(links, linkCompare, new Link(92, 16, 18, pane));
-        addOnOrder(links, linkCompare, new Link(87, 18, 19, pane));
+        addOnOrder(links, linkCompare, new Link(87, 18, 19, pane));*/
+        Object obj;
+        ArrayList<ArrayList> array;
+        try {
+            FileInputStream fileIn = new FileInputStream("./Romania.gsaa");
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            obj = in.readObject();
+            in.close();
+            fileIn.close();
 
+            array = (ArrayList<ArrayList>) obj;
+            serializedCities = (ArrayList<SerializableCityInfo>) array.get(0);
+            serializedLinks = (ArrayList<SerializableLinkInfo>) array.get(1);
+
+            for (int i = 0; i < serializedCities.size(); i++) {
+                cities.add(new City(serializedCities.get(i).getCityName(), serializedCities.get(i).getHeuristicValue(),
+                        pane));
+            }
+            for (int i = 0; i < cities.size(); i++) {
+                cities.get(i).layoutXProperty().bind(pane.widthProperty().divide(serializedCities.get(i).getxDivBind())
+                        .multiply(serializedCities.get(i).getxMulBind()));
+                cities.get(i).layoutYProperty().bind(pane.heightProperty().subtract(serializedCities.get(i).getySubBind())
+                        .divide(serializedCities.get(i).getyDivBind()).multiply(serializedCities.get(i).getyMulBind()));
+            }
+            for (int i = 0; i < serializedLinks.size(); i++) {
+                links.add(new Link(serializedLinks.get(i).getCost(), serializedLinks.get(i).getSourceIndex(),
+                        serializedLinks.get(i).getDestinationIndex(), pane));
+            }
+        } catch (FileNotFoundException ex) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Corrupted File");
+            alert.setContentText("Sorry but the file was corrupted\n"
+                    + "Re-download [Romania.gsaa] from the repository at github");
+            alert.showAndWait();
+        } catch (IOException | ClassNotFoundException ex) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Corrupted File");
+            alert.setContentText("Sorry but the file was corrupted\n"
+                    + "Re-download [Romania.gsaa] from the repository on github");
+            alert.showAndWait();
+        }
         //#FFE4C4 OR F5F5DC
         pane.getStylesheets().add("./StylingCSS/styles.css");
         pane.setId("background");
@@ -1244,7 +1285,7 @@ public class GSAA extends Application {
                         alert.setTitle("Can not reach");
                         alert.setContentText("Sorry but I am stuck here\n"
                                 + " I think the target is not reachable ");
-                        GridPane g = (GridPane) alert.getDialogPane().lookup(".header-panel");
+                        /*GridPane g = (GridPane) alert.getDialogPane().lookup(".header-panel");
                         g.setStyle("-fx-background-color: #E8E8E8");
                         ButtonBar btnBar = (ButtonBar) alert.getDialogPane().lookup(".button-bar");
                         btnBar.setStyle("-fx-background-color: #E8E8E8");
@@ -1262,7 +1303,7 @@ public class GSAA extends Application {
                                 + "-fx-font-size: 12px;"
                                 + "-fx-padding: 10 20 10 20;"
                                 + "-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );"));
-                        alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");
+                        alert.getDialogPane().setStyle("-fx-background-color: #E8E8E8");*/
                         alert.show();
                     });
                     return;

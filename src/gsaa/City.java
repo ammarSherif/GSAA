@@ -40,8 +40,9 @@ public class City extends Button {
     /**
      * this creates a new city and specify its behavior as a city,
      * like possibility to be dragged, marked, and deleted
-     * @param name name of the City
-     * @param heuristicValue the heuristic value specified to the city
+     * @param name name of the City.
+     * @param heuristicValue the heuristic value specified to the city.
+     * @param pane the pane in which this city would be.
      */
     public City(String name, double heuristicValue, Pane pane) {
         City.pane = pane;

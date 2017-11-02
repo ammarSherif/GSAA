@@ -27,8 +27,8 @@ import javafx.scene.shape.StrokeLineJoin;
 public class Link extends Line {
 
     private double cost;
-    private int firstIndex;
-    private int secondIndex;
+    private final int firstIndex;
+    private final int secondIndex;
     // array of all cities in the program
     private final static ArrayList<City> CITIES = GSAA.getCities();
     // key is a distinct parameter of each link consists of names of the two CITIES
